@@ -1,0 +1,25 @@
+<setup>
+    <fps>60</fps>
+</setup>
+<client>
+    <ip>127.0.0.1</ip>
+    <port>1234</port>
+    <name>Isadora local</name>
+    <rigid>0</rigid>
+    <marker>0</marker>
+    <skeleton>0</skeleton>
+    <live>1</live>
+    <hierarchy>0</hierarchy>
+    <mode>0</mode>
+</client>
+<client>
+    <ip>192.168.42.18</ip>
+    <port>1234</port>
+    <name>IsadoraTony</name>
+    <rigid>0</rigid>
+    <marker>0</marker>
+    <skeleton>0</skeleton>
+    <live>1</live>
+    <hierarchy>0</hierarchy>
+    <mode>0</mode>
+</client>
