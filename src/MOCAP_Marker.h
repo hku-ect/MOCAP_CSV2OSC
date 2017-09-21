@@ -66,7 +66,7 @@ public:
     }
     
     // Get data for specifick frame and create an OSC message for it
-    void getOSCData(int frame, ofxOscMessage *m, Boolean notPartSkeleton ){
+    void getOSCData(int frame, ofxOscMessage *m, bool notPartSkeleton ){
         
         if(notPartSkeleton){
             m->setAddress("/rigidbody");

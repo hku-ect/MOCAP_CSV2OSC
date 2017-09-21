@@ -18,7 +18,7 @@
 
 
 // boolean to check if we play the data or not
-Boolean playData = false;
+bool playData = false;
 
 
 //--------------------------------------------------------------

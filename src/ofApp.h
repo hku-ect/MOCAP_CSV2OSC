@@ -50,7 +50,7 @@ class ofApp : public ofBaseApp{
     
         vector<client*>             clients;
     
-        Boolean dataLoaded;
+        bool dataLoaded;
         int frameNum;
         int totalFrames;
         int frameRate;

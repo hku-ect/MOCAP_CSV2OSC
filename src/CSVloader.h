@@ -226,7 +226,7 @@ public:
     }
     
     // return if the fil is already loaded
-    Boolean checkFileLoaded()
+    bool checkFileLoaded()
     {
         unique_lock<std::mutex> lock(mutex);
         return fileLoaded;
@@ -275,7 +275,7 @@ protected:
     int count;              // use as frame counter for loading feedabck
     int numFrames;          // use to store number of frames in recording
     ofFile file;            // the filw that is being loaded
-    Boolean fileLoaded;     // store if file is loaded or not
+    bool fileLoaded;     // store if file is loaded or not
     ofBuffer csvBuffer;     // buffer to store the data
     // map to store the found rigidboies and their data
     std::map<string,MOCAP_Marker> rigidbodies;
