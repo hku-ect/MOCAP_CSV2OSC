@@ -26,7 +26,7 @@ The OSC message consist of a message with with the label /rigidbody and contains
 
 The units are floats and can either be in meters of centimeters depending on the recording.
 
-### Skeleton message:
+### Skeleton message: `/skeleton/<NameOfSkeleton>/<NameOfJoint>`
 
 The OSC message consist of a message with with the label `/skeleton/<NameOfSkeleton>/<NameOfJoint>` and contains 8 values:
 
