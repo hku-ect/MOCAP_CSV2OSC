@@ -10,7 +10,6 @@
 #include "ofxXmlSettings.h"
 #include "client.h"
 
-
 #define HOST "192.168.0.105"
 #define PORT 1234
 
@@ -41,6 +40,7 @@ class ofApp : public ofBaseApp{
         void saveData();
         void setupData();
         void setFPS();
+        void doFrame();
     
         void deactivateInputs();
     
@@ -52,8 +52,12 @@ class ofApp : public ofBaseApp{
     
         bool dataLoaded;
         int frameNum;
+        float fFrameNum;
         int totalFrames;
         int frameRate;
+        float frameTime;
+        float fTimeCounter;
+    
         std::map<string,MOCAP_Marker> rigidbodies;
         std::map<string,MOCAP_Skeleton> skeletons;
         ofxOscSender sender;
