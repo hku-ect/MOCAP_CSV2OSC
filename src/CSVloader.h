@@ -85,14 +85,11 @@ public:
                             rb.second.addMarkerEntry(data);
                         }
                         
-                        
                         // loop through skeletons
                         for (auto & sk : skeletons)
                         {
                             sk.second.addSkeletonEntry(data);
                         }
-
-                        
                     }
                     
                     // clear the lock

@@ -16,10 +16,10 @@
 // TODO: use OSC bundle
 
 
+const float MOTIVE_MOCAP_FPS = 120.0f;
 
 // boolean to check if we play the data or not
 bool playData = false;
-
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -63,8 +63,8 @@ void ofApp::setup(){
     
 
 
-    
-    //ofSetFrameRate(90);
+    //default framerate
+    ofSetFrameRate(60);
 }
 
 //--------------------------------------------------------------
@@ -79,7 +79,9 @@ void ofApp::setupData()
     //interfaceIP.setText(natnetip);
     fps.setText(ofToString(fRate));
     
-    ofSetFrameRate(fRate);
+    frameRate = fRate;
+    frameTime = 1.0 / fRate;
+    //ofSetFrameRate(fRate);
     data.popTag();
     
     int numClients = data.getNumTags("client");
@@ -115,84 +117,78 @@ void ofApp::update(){
         totalFrames = csvloader.getNumFrames();
         // (re)set starting frame to zero
         frameNum = 0;
+        fFrameNum = 0;
         // data is loaded
         dataLoaded = true;
         // we can start playing
         playData = true;
     }
     
+    //TODO: offload this to an ofThread, so we can run it completely independently from the ofFrameRate
+    // run frameloop based on time (semi-independent from ofFrameRate)
+    fTimeCounter += ofGetLastFrameTime();
+    while ( fTimeCounter >= frameTime ) {
+        doFrame();
+        fTimeCounter -= frameTime;
+    }
+}
+
+void ofApp::doFrame() {
     // SEND OSC
     if(dataLoaded == true && playData == true){
-        
         //ofLogVerbose("frame: "+ofToString(frameNum));
-        
         
         for( int i = 0; i < clients.size(); ++i )
         {
-            /*
-             ofxOscBundle bundle;
-             
-             //markers
-             if ( clients[i]->getMarker() )
-             getMarkers( clients[i], &bundle );
-             
-             //rigidbodies
-             if ( rigidbodiesReady && clients[i]->getRigid() )
-             getRigidbodies( clients[i], &bundle, rbd );
-             
-             //skeletons
-             if ( skeletonsReady && clients[i]->getSkeleton() )
-             getSkeletons( clients[i], &bundle, sd );
-             
-             //check if not empty & send
-             if ( bundle.getMessageCount() > 0 )
-             {
-             clients[i]->sendBundle(bundle);
-             }
-             */
+            ofxOscBundle bundle;
             
             for (auto & rb : rigidbodies)
             {
                 ofxOscMessage m;
                 rb.second.getOSCData(frameNum, &m, true);
-                clients[i]->sendData(m);
+                bundle.addMessage(m);
             }
             
             // loop through skeletons
             for (auto & sk : skeletons)
             {
                 //ofxOscMessage m = sk.second.getOSCData(frameNum);
-                std::vector<ofxOscMessage> ms = sk.second.getOSCDataHierarchy(frameNum);
+                std::vector<ofxOscMessage> ms;
+                if ( clients[i]->getHierarchy() ) {
+                    ms = sk.second.getOSCDataHierarchy(frameNum, clients[i]->getMode());
+                }
+                else {
+                    ms.push_back(sk.second.getOSCData(frameNum, clients[i]->getMode()));
+                }
                 for( ofxOscMessage m : ms){
-                    clients[i]->sendData(m);
+                    bundle.addMessage(m);
                 }
             }
             
-            
+            //check if not empty & send
+            if ( bundle.getMessageCount() > 0 )
+            {
+                clients[i]->sendBundle(bundle);
+            }
         }
         
         //UPDATE FRAMES
         // advance to the next frame
-        if(frameNum < totalFrames){
-            frameNum++;
+        // scales the amount of frames to step based on framerate
+        // stores this as a float to allow for more accurate frame-stepping
+        if ( frameRate != 0 ) {
+            float frameStep = MOTIVE_MOCAP_FPS / frameRate;
+            fFrameNum += frameStep;
+            if ( fFrameNum >= totalFrames ) {
+                fFrameNum -= totalFrames;
+            }
+            frameNum = (int)fFrameNum;
         }
-        else if(frameNum >= totalFrames){
-            frameNum = 0;
-        }
-
     }
-    
-    
-    
-
-
-    
-    
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    
     //ofDrawBitmapString("Press 'l' to load file", 20, 15);
     ofSetColor(255);
     ofSetBackgroundColor(40);
@@ -462,7 +458,8 @@ void ofApp::mousePressed(int x, int y, int button){
     if(saveBTN.isInside(x, y)) saveData();
     if(setFPSBTN.isInside(x,y)){
         frameRate = ofToInt(fps.getText());
-        ofSetFrameRate(frameRate);
+        frameTime = 1.0f / frameRate;
+        //ofSetFrameRate(frameRate);
     }
     if(playpauseBTN.isInside(x,y)){
         ofLogVerbose("hit play/pause button");
@@ -474,6 +471,7 @@ void ofApp::mousePressed(int x, int y, int button){
     
     if(rewindBTN.isInside(x,y)){
         frameNum = 0;
+        fFrameNum = 0;
     }
 
     

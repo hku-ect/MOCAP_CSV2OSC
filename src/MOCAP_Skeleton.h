@@ -9,6 +9,9 @@
 #ifndef MOCAP_Skeleton_h
 #define MOCAP_Skeleton_h
 
+#include "client.h"
+
+
 
 class MOCAP_Skeleton{
 public:
@@ -68,15 +71,21 @@ public:
     }
     
     // get the data of the skeleton for a specific frame and return as osc message
-    ofxOscMessage getOSCData(int frame){
+    ofxOscMessage getOSCData(int frame, ClientMode mode ){
         ofxOscMessage m;
         m.setAddress("/skeleton");
-        m.addIntArg(id);
         m.addStringArg(name);
+        m.addIntArg(id);
         
         // loop through the bones
         for( MOCAP_Marker &bone : bones){
-            bone.getOSCData(frame,&m, false);
+            // full skeleton adds skeleton prefix to bone name
+            if ( mode == ClientMode_FullSkeleton ) {
+                bone.getOSCData(frame,&m,false,name+"_");
+            }
+            else {
+                bone.getOSCData(frame,&m,false);
+            }
         }
         
         return m;
@@ -84,7 +93,7 @@ public:
     
     // get the data of the skeleton for a specific frame and return as osc message
     // /skeleton/skeletonname/bone
-    std::vector<ofxOscMessage> getOSCDataHierarchy(int frame){
+    std::vector<ofxOscMessage> getOSCDataHierarchy(int frame, ClientMode mode ){
         
         
        std::vector<ofxOscMessage> messages;
@@ -96,7 +105,12 @@ public:
             m.setAddress("/skeleton/"+name+"/"+bone.getName());
             // add position
             ofVec3f position = bone.getPosition(frame); // FIXME: better to do with map and lookup?
-            m.addStringArg(bone.getName());
+            if ( mode == ClientMode_FullSkeleton ) {
+                m.addStringArg(bone.getName());
+            }
+            else {
+                m.addStringArg(name + "_" + bone.getName());
+            }
             m.addFloatArg(position.x);
             m.addFloatArg(position.y);
             m.addFloatArg(position.z);
@@ -114,9 +128,6 @@ public:
         
         return messages;
     }
-
-    
-    
     
 protected:
     std::vector<MOCAP_Marker> bones;

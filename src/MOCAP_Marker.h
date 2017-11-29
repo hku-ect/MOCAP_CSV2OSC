@@ -45,14 +45,16 @@ public:
         time.push_back(ofToFloat(data[timeNumID]));
         
         // create quarternion for rotation
-        ofQuaternion rotation(ofToFloat(data[startRot]),ofToFloat(data[startRot+1]),ofToFloat(data[startRot+2]),ofToFloat(data[startRot+3]));
+        ofQuaternion rotation(ofToFloat(data[startCollumn + startRot]),ofToFloat(data[ startCollumn + startRot+1]),ofToFloat(data[startCollumn + startRot + 2]),ofToFloat(data[startCollumn + startRot+3]));
         // create ofVec3f for position
-        ofVec3f position(ofToFloat(data[lenghtPOS]),ofToFloat(data[lenghtPOS+1]),ofToFloat(data[lenghtPOS+2]));
+        ofVec3f position(ofToFloat(data[startCollumn + startPOS]),ofToFloat(data[startCollumn + startPOS +1]),ofToFloat(data[startCollumn + startPOS + 2]));
         
         // add the position for this frame/timestamp
         positions.push_back(position);
         // add the rotation for this frame/timestamp
         rotations.push_back(rotation);
+        
+        isActive.push_back(1);
     }
     
     // send to the console the data for a specifick frame
@@ -66,13 +68,17 @@ public:
     }
     
     // Get data for specifick frame and create an OSC message for it
-    void getOSCData(int frame, ofxOscMessage *m, bool notPartSkeleton ){
+    void getOSCData(int frame, ofxOscMessage *m, bool notPartSkeleton, string prefix = "" ){
         
         if(notPartSkeleton){
-            m->setAddress("/rigidbody");
+            m->setAddress("/rigidBody");
             m->addIntArg(id);
+            m->addStringArg(name);
         }
-        m->addStringArg(name);
+        else {
+            m->addStringArg(prefix + name);
+        }
+        
         // add position
         ofVec3f position = positions[frame]; // FIXME: better to do with map and lookup?
         m->addFloatArg(position.x);
@@ -86,16 +92,31 @@ public:
         m->addFloatArg(rotation.z());
         m->addFloatArg(rotation.w());
         
-        // add position speed
-        // TODO: position speed
-        
-        // add rotation speed
-        // TODO: add rotation speed
-        
-        // add is active
-        // TODO: add is active
-        
-        
+        ///skeleton specific
+        if ( notPartSkeleton ) {
+            // add position speed
+            // TODO: position speed (currently 0)
+            m->addFloatArg(0);
+            m->addFloatArg(0);
+            m->addFloatArg(0);
+            
+            // add rotation speed
+            // TODO: add rotation speed (currently 0)
+            m->addFloatArg(0);
+            m->addFloatArg(0);
+            m->addFloatArg(0);
+            
+            // add is active
+            // TODO: add is active (currently always active)
+            m->addIntArg(1);
+        }
+        else {
+            // add parent bone index
+            // TODO: parent id
+            
+            // add parent offset (xyz)
+            // TODO: add parent offset
+        }
     }
     
     // return the collumn in the file where the data starts
@@ -135,14 +156,19 @@ protected:
     std::vector<float> time;
     std::vector<ofVec3f> positions;
     std::vector<ofQuaternion> rotations;
+    std::vector<int> isActive;
     
     // Definition of the OPTITRACK MOCAP RIGID BODIE Data string
     // defines how the data structure in the CSV file is written
+    
+    //global for all frames
     int frameNumID = 0;
     int timeNumID = 1;
-    int startPOS = 6;
+    
+    //relative to startColumn
+    int startPOS = 4;
     int lenghtPOS = 3;
-    int startRot = 2;
+    int startRot = 0;
     int lengthRot = 4;
     
 };
