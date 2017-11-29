@@ -105,7 +105,7 @@ public:
             m.setAddress("/skeleton/"+name+"/"+bone.getName());
             // add position
             ofVec3f position = bone.getPosition(frame); // FIXME: better to do with map and lookup?
-            if ( mode -= ClientMode_FullSkeleton ) {
+            if ( mode == ClientMode_FullSkeleton ) {
                 m.addStringArg(name + "_" + bone.getName());
             }
             else {
