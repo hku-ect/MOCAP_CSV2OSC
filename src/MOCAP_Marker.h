@@ -68,13 +68,20 @@ public:
     }
     
     // Get data for specifick frame and create an OSC message for it
-    void getOSCData(int frame, ofxOscMessage *m, bool notPartSkeleton, string prefix = "" ){
+    void getOSCData(int frame, ofxOscMessage *m, bool hierarchy, bool notPartSkeleton, string prefix = "" ){
         
+        // RIGID BODY
         if(notPartSkeleton){
-            m->setAddress("/rigidBody");
+            if(hierarchy==true){ // USE HIEARCHY MODE (for example for Isadora)
+                m->setAddress("/rigidbody/"+name);
+            }
+            else{ // USE NON-HIEARCHY MODE (for example for Processing or OF)
+                m->setAddress("/rigidBody");
+            }
             m->addIntArg(id);
             m->addStringArg(name);
         }
+        // SKELETON BONE
         else {
             m->addStringArg(prefix + name);
         }
