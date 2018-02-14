@@ -145,7 +145,7 @@ void ofApp::doFrame() {
             for (auto & rb : rigidbodies)
             {
                 ofxOscMessage m;
-                rb.second.getOSCData(frameNum, &m, true);
+                rb.second.getOSCData(frameNum, &m, clients[i]->getHierarchy(), true);
                 bundle.addMessage(m);
             }
             

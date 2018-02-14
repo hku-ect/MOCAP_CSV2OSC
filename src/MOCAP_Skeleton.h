@@ -81,10 +81,10 @@ public:
         for( MOCAP_Marker &bone : bones){
             // full skeleton adds skeleton prefix to bone name
             if ( mode == ClientMode_FullSkeleton ) {
-                bone.getOSCData(frame,&m,false,name+"_");
+                bone.getOSCData(frame,&m,false,false,name+"_");
             }
             else {
-                bone.getOSCData(frame,&m,false);
+                bone.getOSCData(frame,&m,false,false);
             }
         }
         
