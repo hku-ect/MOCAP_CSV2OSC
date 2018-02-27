@@ -8,7 +8,7 @@
 
 #include "client.h"
 
-client::client(int ind,string i,int p,string n,bool r,bool m,bool s, bool live, bool hier, ClientMode cMode )
+client::client(int ind,string i,int p,string n,bool r,bool m,bool s, bool hier, ClientMode cMode )
 {
     //arange them gridwise
     index = ind;
@@ -18,7 +18,6 @@ client::client(int ind,string i,int p,string n,bool r,bool m,bool s, bool live, 
     isRigid = r;
     isMarker = m;
     isSkeleton = s;
-    isLive = live;
     deepHierarchy = hier;
     mode = cMode;
     notWholeScreen = true;
@@ -64,7 +63,6 @@ void client::rearangePosition(int ind, bool _notWholeScreen)
     markButton = ofRectangle(70, width, width, width);
     skelButton = ofRectangle(140, width, width, width);
     hierarchyButton = ofRectangle(300, width, width, width);
-    liveButton = ofRectangle(300, width*2, width, width);
     delButton = ofRectangle(area.width - (width / 2), 0, width / 2, width / 2);
     
     //todo: add some kind of "mode" setup for gears, or which things we want to send or not send?
@@ -103,8 +101,6 @@ void client::draw()
     //verdana14.drawString("Mark", 100, 50);
     //verdana14.drawString("Skel", 170, 50);
     verdana14.drawString("Hierarchy", 230, 50);
-    verdana14.drawString("Live", 270, 80);
-    
     
     //mode
     verdana14.drawString(ClientModeNames[(int)mode], 30, 80 );
@@ -133,10 +129,6 @@ void client::drawGUI()
     ofDrawRectangle(skelButton);
     */
     
-    if (!isLive) ofSetColor(255, 0, 0);
-    else ofSetColor(0,255,0);
-    ofDrawRectangle(liveButton);
-    
     if (!deepHierarchy) ofSetColor(255, 0, 0);
     else ofSetColor(0,255,0);
     ofDrawRectangle(hierarchyButton);
@@ -159,7 +151,6 @@ void client::isInside(int & xp, int & yp)
     bool rig = rigButton.inside(x, y);
     bool mark = markButton.inside(x, y);
     bool skel = skelButton.inside(x, y);
-    bool live = liveButton.inside(x, y);
     bool hierarchy = hierarchyButton.inside(x, y);
     bool del = delButton.inside(x, y);
     bool modeClicked = modeButton.inside(x, y);
@@ -169,8 +160,6 @@ void client::isInside(int & xp, int & yp)
     else if (mark) isMarker = !isMarker;
     
     else if (skel) isSkeleton = !isSkeleton;
-    
-    else if (live) isLive = !isLive;
     
     else if (hierarchy) deepHierarchy = !deepHierarchy;
     
@@ -242,11 +231,6 @@ bool &client::getMarker()
 bool &client::getSkeleton()
 {
     return isSkeleton;
-}
-
-bool &client::getLive()
-{
-    return isLive;
 }
 
 bool &client::getHierarchy()

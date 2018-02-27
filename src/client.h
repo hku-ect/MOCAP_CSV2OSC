@@ -33,7 +33,7 @@ static const char* ClientModeNames[] =
 class client
 {
 public:
-    client(int ind,string i,int p,string n,bool r,bool m,bool s, bool live, bool hier, ClientMode mode);
+    client(int ind,string i,int p,string n,bool r,bool m,bool s, bool hier, ClientMode mode);
     ~client();
     
     void setupSender();
@@ -58,7 +58,6 @@ public:
     bool &getRigid();
     bool &getMarker();
     bool &getSkeleton();
-    bool &getLive();
     bool &getHierarchy();
     bool notWholeScreen;
     ClientMode &getMode();
@@ -74,7 +73,6 @@ private:
     bool            isRigid;
     bool            isMarker;
     bool            isSkeleton;
-    bool            isLive;
     bool            deepHierarchy;
     ClientMode      mode;
     
@@ -83,7 +81,6 @@ private:
     ofRectangle     rigButton;
     ofRectangle     markButton;
     ofRectangle     skelButton;
-    ofRectangle     liveButton;
     ofRectangle     hierarchyButton;
     ofRectangle     delButton;
     ofRectangle     modeButton;
