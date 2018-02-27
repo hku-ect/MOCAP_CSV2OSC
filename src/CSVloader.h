@@ -19,7 +19,6 @@
 #include "MOCAP_Marker.h"
 #include "MOCAP_Skeleton.h"
 
-
 /*
  
  Name: CSVloader
@@ -32,7 +31,7 @@ class CSVloader: public ofThread
 {
 public:
     /// Create a ThreadedObject and initialize the member
-    CSVloader(): count(0), shouldThrowTestException(false)
+    CSVloader(): count(0)
     {
     }
     
@@ -257,9 +256,6 @@ public:
     
     
 protected:
-    // A flag to check and see if we should throw a test exception.
-    Poco::AtomicCounter shouldThrowTestException;
-    
     // This is a simple variable that we aim to always access from both the
     // main thread AND this threaded object.  Therefore, we need to protect it
     // with the mutex.  In the case of simple numerical variables, some
