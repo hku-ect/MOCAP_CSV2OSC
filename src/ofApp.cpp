@@ -299,7 +299,6 @@ void ofApp::saveData()
         save.addValue("rigid", clients[i]->getRigid());
         save.addValue("marker", clients[i]->getMarker());
         save.addValue("skeleton", clients[i]->getSkeleton());
-        save.addValue("live", clients[i]->getLive());
         save.addValue("hierarchy", clients[i]->getHierarchy());
         save.addValue("mode", clients[i]->getMode());
         save.popTag();
@@ -311,7 +310,7 @@ void ofApp::saveData()
 //--------------------------------------------------------------
 void ofApp::addClient(int i,string ip,int p,string n,bool r,bool m,bool s, bool live, bool hierarchy, ClientMode mode)
 {
-    client *c = new client(i,ip,p,n,r,m,s,live, hierarchy, mode);
+    client *c = new client(i,ip,p,n,r,m,s,hierarchy, mode);
     ofAddListener(c->deleteClient, this, &ofApp::deleteClient);
     clients.push_back(c);
 }
