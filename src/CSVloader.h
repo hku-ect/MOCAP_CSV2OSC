@@ -129,7 +129,7 @@ public:
         // show status of loading (when loading)
         if(fileLoaded == false){
             string s = "loading "+ofToString(count)+"/"+ofToString(numFrames);
-            ofDrawBitmapString(s, ofGetWidth() - 250, 55);
+            ofDrawBitmapString(s, 550, 55);
         }
         
     }
