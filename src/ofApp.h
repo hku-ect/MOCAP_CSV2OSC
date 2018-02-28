@@ -35,7 +35,7 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
     
         void loadAFile();
-        void addClient(int i,string ip,int p,string n,bool r,bool m,bool s,bool live, bool hierarchy, ClientMode mode);
+        void addClient(int i,string ip,int p,string n,bool r,bool m,bool s,bool live, bool hierarchy);
         void deleteClient(int &index);
         void saveData();
         void setupData();

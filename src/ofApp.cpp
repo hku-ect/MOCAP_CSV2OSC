@@ -9,9 +9,6 @@
 
 
 // TODO: Set right ID's for rigidbodies and skeletons
-// TODO: cleanup the clients drawing with proper buttons
-// TODO: implement the live button
-// TODO: implement the hiearchy button
 // TODO: set looping to be an option
 // TODO: use OSC bundle
 
@@ -96,8 +93,7 @@ void ofApp::setupData()
         bool s = data.getValue("skeleton", 0);
         bool live = data.getValue("live", 0);
         bool hier = data.getValue("hierarchy", 0);
-        ClientMode mode = (ClientMode)data.getValue("mode", 0);
-        addClient(i,ip,port,name,r,m,s,live,hier,mode);
+        addClient(i,ip,port,name,r,m,s,live,hier);
         data.popTag();
     }
 }
@@ -155,10 +151,10 @@ void ofApp::doFrame() {
                 //ofxOscMessage m = sk.second.getOSCData(frameNum);
                 std::vector<ofxOscMessage> ms;
                 if ( clients[i]->getHierarchy() ) {
-                    ms = sk.second.getOSCDataHierarchy(frameNum, clients[i]->getMode());
+                    ms = sk.second.getOSCDataHierarchy(frameNum);
                 }
                 else {
-                    ms.push_back(sk.second.getOSCData(frameNum, clients[i]->getMode()));
+                    ms.push_back(sk.second.getOSCData(frameNum));
                 }
                 for( ofxOscMessage m : ms){
                     bundle.addMessage(m);
@@ -300,7 +296,6 @@ void ofApp::saveData()
         save.addValue("marker", clients[i]->getMarker());
         save.addValue("skeleton", clients[i]->getSkeleton());
         save.addValue("hierarchy", clients[i]->getHierarchy());
-        save.addValue("mode", clients[i]->getMode());
         save.popTag();
     }
     save.save("setup.xml");
@@ -308,9 +303,9 @@ void ofApp::saveData()
 
 
 //--------------------------------------------------------------
-void ofApp::addClient(int i,string ip,int p,string n,bool r,bool m,bool s, bool live, bool hierarchy, ClientMode mode)
+void ofApp::addClient(int i,string ip,int p,string n,bool r,bool m,bool s, bool live, bool hierarchy)
 {
-    client *c = new client(i,ip,p,n,r,m,s,hierarchy, mode);
+    client *c = new client(i,ip,p,n,r,m,s,hierarchy);
     ofAddListener(c->deleteClient, this, &ofApp::deleteClient);
     clients.push_back(c);
 }
@@ -451,7 +446,7 @@ void ofApp::mousePressed(int x, int y, int button){
     if(fps.isInside(x, y)) return;
     if(addBTN.isInside(x, y))
     {
-        addClient(clients.size(), newIP.getText(), ofToInt(newPort.getText()), newName.getText(), false, false, false, true, false, ClientMode_Default);
+        addClient(clients.size(), newIP.getText(), ofToInt(newPort.getText()), newName.getText(), false, false, false, true, false);
         return;
     }
     if(saveBTN.isInside(x, y)) saveData();
