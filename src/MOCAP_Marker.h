@@ -117,25 +117,6 @@ public:
             // TODO: add is active (currently always active)
             m->addIntArg(1);
         }
-        else {
-            // add parent bone index
-            // TODO: parent id
-            
-            // add parent offset (xyz)
-            // TODO: add parent offset
-            
-            //needed for skeleton retargeting
-            /*
-            if ( c->getMode() == ClientMode_FullSkeleton )
-            {
-                m.addIntArg(rbd[i].parent_id);
-                m.addFloatArg(rbd[i].offset.x);
-                m.addFloatArg(rbd[i].offset.y);
-                m.addFloatArg(rbd[i].offset.z);
-            }
-            */
-
-        }
     }
     
     // return the collumn in the file where the data starts
