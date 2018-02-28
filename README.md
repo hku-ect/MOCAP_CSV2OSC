@@ -2,7 +2,11 @@
 
 MOCAP CSV2OSC is a small application that loads a CSV file exported from a Motive recording. The loaded CSV file can then be played back sending it's data through OSC over the netwrok in the same format as the NatNet2OSC bridge.
 
-This application is meant to be used together with a Motive recording so you can work with MOCAP data without having the acces to a MOCAP instalaltion.
+This application is meant to be used together with a Motive recording so you can work with MOCAP data without having the access to a MOCAP instalaltion.
+
+## Warning
+
+Due to limitations when exporting a Motive recording as CSV it is not possible to stream the parent ID and offset of the bones of the skeleton. This means you CANNOT use this tool to stream skeleton data to Unity with bone parenting structure.
 
 # OSC Data Structure
 
