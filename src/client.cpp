@@ -8,7 +8,7 @@
 
 #include "client.h"
 
-client::client(int ind,string i,int p,string n,bool r,bool m,bool s, bool hier, ClientMode cMode )
+client::client(int ind,string i,int p,string n,bool r,bool m,bool s, bool hier)
 {
     //arange them gridwise
     index = ind;
@@ -19,7 +19,6 @@ client::client(int ind,string i,int p,string n,bool r,bool m,bool s, bool hier, 
     isMarker = m;
     isSkeleton = s;
     deepHierarchy = hier;
-    mode = cMode;
     notWholeScreen = true;
     
     rearangePosition(ind,notWholeScreen);
@@ -57,7 +56,7 @@ void client::rearangePosition(int ind, bool _notWholeScreen)
     int width = 30;
     int x = 20 + 340 * (index%numCollumns);
     int row = (index / numCollumns);
-    int height = width * 3;
+    int height = int(width * 2.1);
     area = ofRectangle(x, 20 + (row * height + (row * 10)), 330, height);
     rigButton = ofRectangle(0, width, width, width);
     markButton = ofRectangle(70, width, width, width);
@@ -101,9 +100,6 @@ void client::draw()
     //verdana14.drawString("Mark", 100, 50);
     //verdana14.drawString("Skel", 170, 50);
     verdana14.drawString("Hierarchy", 230, 50);
-    
-    //mode
-    verdana14.drawString(ClientModeNames[(int)mode], 30, 80 );
     
     ofPopMatrix();
 }
@@ -153,7 +149,6 @@ void client::isInside(int & xp, int & yp)
     bool skel = skelButton.inside(x, y);
     bool hierarchy = hierarchyButton.inside(x, y);
     bool del = delButton.inside(x, y);
-    bool modeClicked = modeButton.inside(x, y);
 
     if (rig) isRigid = !isRigid;
     
@@ -165,15 +160,6 @@ void client::isInside(int & xp, int & yp)
     
     else if (del) ofNotifyEvent(deleteClient,index);
     
-    else if (modeClicked)
-    {
-        int iMode = (int)mode;
-        if ( ++iMode == (int)ClientMode_END )
-        {
-            iMode = 0;
-        }
-        mode = (ClientMode)iMode;
-    }
 }
 
 string &client::getName()
@@ -238,7 +224,3 @@ bool &client::getHierarchy()
     return deepHierarchy;
 }
 
-ClientMode &client::getMode()
-{
-    return mode;
-}

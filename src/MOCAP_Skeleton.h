@@ -71,7 +71,7 @@ public:
     }
     
     // get the data of the skeleton for a specific frame and return as osc message
-    ofxOscMessage getOSCData(int frame, ClientMode mode ){
+    ofxOscMessage getOSCData(int frame){
         ofxOscMessage m;
         m.setAddress("/skeleton");
         m.addStringArg(name);
@@ -79,13 +79,7 @@ public:
         
         // loop through the bones
         for( MOCAP_Marker &bone : bones){
-            // full skeleton adds skeleton prefix to bone name
-            if ( mode == ClientMode_FullSkeleton ) {
-                bone.getOSCData(frame,&m,false,false,name+"_");
-            }
-            else {
-                bone.getOSCData(frame,&m,false,false);
-            }
+            bone.getOSCData(frame,&m,false,false);
         }
         
         return m;
@@ -93,7 +87,7 @@ public:
     
     // get the data of the skeleton for a specific frame and return as osc message
     // /skeleton/skeletonname/bone
-    std::vector<ofxOscMessage> getOSCDataHierarchy(int frame, ClientMode mode ){
+    std::vector<ofxOscMessage> getOSCDataHierarchy(int frame){
         
         
        std::vector<ofxOscMessage> messages;
@@ -105,12 +99,7 @@ public:
             m.setAddress("/skeleton/"+name+"/"+bone.getName());
             // add position
             ofVec3f position = bone.getPosition(frame); // FIXME: better to do with map and lookup?
-            if ( mode == ClientMode_FullSkeleton ) {
-                m.addStringArg(name + "_" + bone.getName());
-            }
-            else {
-                m.addStringArg(bone.getName());
-            }
+            m.addStringArg(bone.getName());
             m.addFloatArg(position.x);
             m.addFloatArg(position.y);
             m.addFloatArg(position.z);

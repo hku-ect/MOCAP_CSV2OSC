@@ -117,13 +117,6 @@ public:
             // TODO: add is active (currently always active)
             m->addIntArg(1);
         }
-        else {
-            // add parent bone index
-            // TODO: parent id
-            
-            // add parent offset (xyz)
-            // TODO: add parent offset
-        }
     }
     
     // return the collumn in the file where the data starts

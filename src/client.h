@@ -13,27 +13,11 @@
 #include "ofMain.h"
 #include "ofxOsc.h"
 
-//TODO: replace with filters!
-enum ClientMode
-{
-    ClientMode_Default      = 0,
-    ClientMode_GearVR       = 1,
-    ClientMode_FullSkeleton = 2,
-    ClientMode_END          = 3
-};
-
-static const char* ClientModeNames[] =
-{
-    "Default",
-    "Gear VR",
-    "Full Skeleton",
-    "INVALID"
-};
 
 class client
 {
 public:
-    client(int ind,string i,int p,string n,bool r,bool m,bool s, bool hier, ClientMode mode);
+    client(int ind,string i,int p,string n,bool r,bool m,bool s, bool hier);
     ~client();
     
     void setupSender();
@@ -60,7 +44,7 @@ public:
     bool &getSkeleton();
     bool &getHierarchy();
     bool notWholeScreen;
-    ClientMode &getMode();
+    
     
     ofEvent<int> deleteClient;
     
@@ -74,7 +58,7 @@ private:
     bool            isMarker;
     bool            isSkeleton;
     bool            deepHierarchy;
-    ClientMode      mode;
+    
     
     
     ofRectangle     area;
