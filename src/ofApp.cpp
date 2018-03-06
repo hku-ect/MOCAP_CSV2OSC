@@ -10,7 +10,6 @@
 
 // TODO: Set right ID's for rigidbodies and skeletons
 // TODO: set looping to be an option
-// TODO: use OSC bundle
 
 
 const float MOTIVE_MOCAP_FPS = 120.0f;
@@ -58,8 +57,6 @@ void ofApp::setup(){
     // get data
     setupData();
     
-
-
     //default framerate
     ofSetFrameRate(60);
 }
@@ -134,39 +131,63 @@ void ofApp::doFrame() {
     if(dataLoaded == true && playData == true){
         //ofLogVerbose("frame: "+ofToString(frameNum));
         
-        for( int i = 0; i < clients.size(); ++i )
+        
+        ofxOscBundle bundleWithHiearchy,bundleNoHiearchy;
+        
+        // Loop through rigidbodies and calculate speed
+        // Do this once every frame..
+        for (auto & rb : rigidbodies)
         {
-            ofxOscBundle bundle;
+            rb.second.calculateSpeed(frameNum);
+        }
+        
+        
+        // Loop through rigidbodies to create OSC messages
+        for (auto & rb : rigidbodies)
+        {
+            ofxOscMessage ms1;
+            rb.second.getOSCData(frameNum, &ms1, true, true);
+            bundleWithHiearchy.addMessage(ms1);
             
-            for (auto & rb : rigidbodies)
-            {
-                ofxOscMessage m;
-                rb.second.getOSCData(frameNum, &m, clients[i]->getHierarchy(), true);
-                bundle.addMessage(m);
+            ofxOscMessage ms2;
+            rb.second.getOSCData(frameNum, &ms2, false, true);
+            bundleNoHiearchy.addMessage(ms2);
+        }
+        
+        
+        // loop through skeletons to create OSC messages
+        for (auto & sk : skeletons)
+        {
+            // WITH HIEARCHY
+            std::vector<ofxOscMessage> messagesWithHierarchy;
+            messagesWithHierarchy = sk.second.getOSCDataHierarchy(frameNum);
+            
+            // Add OSCmessages to the bundle
+            for( ofxOscMessage m : messagesWithHierarchy){
+                bundleWithHiearchy.addMessage(m);
             }
             
-            // loop through skeletons
-            for (auto & sk : skeletons)
-            {
-                //ofxOscMessage m = sk.second.getOSCData(frameNum);
-                std::vector<ofxOscMessage> ms;
-                if ( clients[i]->getHierarchy() ) {
-                    ms = sk.second.getOSCDataHierarchy(frameNum);
-                }
-                else {
-                    ms.push_back(sk.second.getOSCData(frameNum));
-                }
-                for( ofxOscMessage m : ms){
-                    bundle.addMessage(m);
-                }
-            }
+            // WITHOUT HIEARCHY
+            ofxOscMessage ms = sk.second.getOSCDataForBones(frameNum);
+            bundleNoHiearchy.addMessage(ms);
+        }
+
+
+        //LOOP THROUGH ALL THE CLIENTS
+        for (std::vector<client*>::iterator it = clients.begin() ; it != clients.end(); ++it)
+        {
+            // send bundle with hiearchy
+            if( (*it)->getHierarchy() ){
             
-            //check if not empty & send
-            if ( bundle.getMessageCount() > 0 )
-            {
-                clients[i]->sendBundle(bundle);
+                (*it)->sendBundle(bundleWithHiearchy);
+                
+            }
+            // send bundle without hiearchy
+            else{
+                (*it)->sendBundle(bundleNoHiearchy);
             }
         }
+         
         
         //UPDATE FRAMES
         // advance to the next frame
@@ -375,6 +396,34 @@ void ofApp::loadAFile(){
     }
 }
 
+//--------------------------------------------------------------
+void ofApp::printOSCmessage(ofxOscMessage m){
+    
+    string msg_string;
+    msg_string = m.getAddress();
+    msg_string += ": ";
+    for(int i = 0; i < m.getNumArgs(); i++){
+        // get the argument type
+        //msg_string += m.getArgTypeName(i);
+        msg_string += " : ";
+        // display the argument - make sure we get the right type
+        if(m.getArgType(i) == OFXOSC_TYPE_INT32){
+            msg_string += ofToString(m.getArgAsInt32(i));
+        }
+        else if(m.getArgType(i) == OFXOSC_TYPE_FLOAT){
+            msg_string += ofToString(m.getArgAsFloat(i));
+        }
+        else if(m.getArgType(i) == OFXOSC_TYPE_STRING){
+            msg_string += m.getArgAsString(i);
+        }
+        else{
+            msg_string += "unknown";
+        }
+    }
+    
+    ofLogWarning(ofToString(msg_string));
+    
+}
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
