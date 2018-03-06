@@ -13,6 +13,8 @@
 #define HOST "192.168.0.105"
 #define PORT 1234
 
+
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -41,6 +43,7 @@ class ofApp : public ofBaseApp{
         void setupData();
         void setFPS();
         void doFrame();
+        void printOSCmessage(ofxOscMessage m);
     
         void deactivateInputs();
     
@@ -49,6 +52,7 @@ class ofApp : public ofBaseApp{
         int mainAppsCount;
     
         vector<client*>             clients;
+        
     
         bool dataLoaded;
         int frameNum;

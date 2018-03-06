@@ -7,9 +7,12 @@
 //
 
 #include "ofxOsc.h"
+#include "RigidBodyHistory.h"
+#include "ofMain.h"
 
 #ifndef marker_h
 #define marker_h
+
 
 class MOCAP_Marker{
     
@@ -21,6 +24,7 @@ public:
         id = _id;                       // id of marker
         name = _name;                   // name of marker
         startCollumn = _startCollumn;   // where in the fiel does the marker start
+        invFPS = 1.0f / ofGetFrameRate();
     }
     
     // add marker entry
@@ -99,23 +103,124 @@ public:
         m->addFloatArg(rotation.z());
         m->addFloatArg(rotation.w());
         
-        ///skeleton specific
+        // With rigidbodie we also sent position speed and rotation speed
+        
         if ( notPartSkeleton ) {
-            // add position speed
-            // TODO: position speed (currently 0)
-            m->addFloatArg(0);
-            m->addFloatArg(0);
-            m->addFloatArg(0);
             
-            // add rotation speed
-            // TODO: add rotation speed (currently 0)
-            m->addFloatArg(0);
-            m->addFloatArg(0);
-            m->addFloatArg(0);
+            //velocity over SMOOTHING * 2 + 1 frames
+            m->addFloatArg(currentVelocity.x);
+            m->addFloatArg(currentVelocity.y);
+            m->addFloatArg(currentVelocity.z);
+            //angular velocity (euler), also smoothed
+            m->addFloatArg(currentAngluarVelocity.x);
+            m->addFloatArg(currentAngluarVelocity.y);
+            m->addFloatArg(currentAngluarVelocity.z);
             
             // add is active
             // TODO: add is active (currently always active)
             m->addIntArg(1);
+        }
+    }
+    
+    
+    void calculateSpeed(int frame){
+        
+        ofVec3f position = positions[frame];
+        ofQuaternion rotation = rotations[frame];
+        
+        //we're going to fetch or create this
+        RigidBodyHistory *rb;
+        
+        //Get or create rigidbodyhistory
+        bool found = false;
+        // Retrieve stored rigidbody
+        for( int r = 0; r < rbHistory.size(); ++r )
+        {
+            if ( rbHistory[r].rigidBodyId == id )
+            {
+                rb = &rbHistory[r];
+                found = true;
+            }
+        }
+        
+        // Add new rigidbody to history
+        if ( !found )
+        {
+            rb = new RigidBodyHistory( id, position, rotation );
+            rbHistory.push_back(*rb);
+            
+        }
+        
+        ofVec3f velocity;
+        ofVec3f angularVelocity;
+        
+        // First run for
+        if ( rb->firstRun == TRUE )
+        {
+            rb->currentDataPoint = 0;
+            rb->firstRun = FALSE;
+        }
+        else
+        {
+            // SAVE data point
+            if ( rb->currentDataPoint < 2 * SMOOTHING + 1 )
+            {
+                rb->velocities[rb->currentDataPoint] = ( position - rb->previousPosition ) * invFPS;
+                
+                ofVec3f diff = ( rb->previousOrientation * rotation.inverse() ).getEuler();
+                rb->angularVelocities[rb->currentDataPoint] = ( diff * invFPS );
+                
+                rb->currentDataPoint++;
+            }
+            else
+            {
+                int count = 0;
+                int maxDist = SMOOTHING;
+                ofVec3f totalVelocity;
+                ofVec3f totalAngularVelocity;
+                //calculate smoothed velocity
+                for( int x = 0; x < SMOOTHING * 2 + 1; ++x )
+                {
+                    //calculate integer distance from "center"
+                    //above - maxDist = influence of data point
+                    int dist = abs( x - SMOOTHING );
+                    int infl = ( maxDist - dist ) + 1;
+                    
+                    //add all
+                    totalVelocity += rb->velocities[x] * infl;
+                    totalAngularVelocity += rb->angularVelocities[x] * infl;
+                    //count "influences"
+                    count += infl;
+                }
+                
+                //divide by total data point influences
+                velocity = totalVelocity / count;
+                angularVelocity = totalAngularVelocity / count;
+                
+                for( int x = 0; x < rb->currentDataPoint - 1; ++x )
+                {
+                    rb->velocities[x] = rb->velocities[x+1];
+                    rb->angularVelocities[x] = rb->angularVelocities[x+1];
+                }
+                rb->velocities[rb->currentDataPoint-1] = ( position - rb->previousPosition ) * invFPS;
+                
+                ofVec3f diff = ( rb->previousOrientation * rotation.inverse() ).getEuler();
+                rb->angularVelocities[rb->currentDataPoint-1] = ( diff * invFPS );
+            }
+            
+            rb->previousPosition = position;
+            rb->previousOrientation = rotation;
+            
+            float scaleFactor = 1000.0;
+            
+            currentVelocity         = velocity * scaleFactor;
+            currentAngluarVelocity  = angularVelocity * scaleFactor;
+            
+            //Check for NAN
+            if(isnan(currentAngluarVelocity.x)) currentAngluarVelocity.x = 0;
+            if(isnan(currentAngluarVelocity.y)) currentAngluarVelocity.y = 0;
+            if(isnan(currentAngluarVelocity.z)) currentAngluarVelocity.z = 0;
+
         }
     }
     
@@ -157,6 +262,13 @@ protected:
     std::vector<ofVec3f> positions;
     std::vector<ofQuaternion> rotations;
     std::vector<int> isActive;
+    
+    // For speed calculation
+    vector<RigidBodyHistory>    rbHistory;
+    float               invFPS;
+    ofVec3f currentVelocity;
+    ofVec3f currentAngluarVelocity;
+
     
     // Definition of the OPTITRACK MOCAP RIGID BODIE Data string
     // defines how the data structure in the CSV file is written
