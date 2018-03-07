@@ -361,9 +361,15 @@ void ofApp::loadAFile(){
     
     //Open the Open File Dialog
     ofFileDialogResult openFileResult= ofSystemLoadDialog("Select a .csv file");
+   
     
     //Check if the user opened a file
     if (openFileResult.bSuccess){
+        
+        // stop playing file
+        playData = false;
+        // set data loaded to false
+        dataLoaded = false;
         
         ofLogVerbose("User selected a file");
         
@@ -380,8 +386,6 @@ void ofApp::loadAFile(){
                 
                 // send file to csvloader who will proces the file in it;s own thread
                 csvloader.setFile(file);
-                
-                
             }
             else{
                 ofLogVerbose("Chosen file is not a csv file");

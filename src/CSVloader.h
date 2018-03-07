@@ -70,13 +70,11 @@ public:
                     currentLine = csvBuffer.getNextLine();
                     // split line in chunks (use the ,
                     vector<string> data = ofSplitString(currentLine, ",");
-
-                    ofLogVerbose(ofToString(count));
                     
                     // get the data from the file
                     // starting form line 7 the data starts
                     if(count > 6 && currentLine != ""){
-                        ofLogVerbose("Frame: "+ofToString(data[0])+" time: "+data[1]);
+                        //ofLogVerbose("Frame: "+ofToString(data[0])+" time: "+data[1]);
                         
                         // loop through rigid bodies
                         for (auto & rb : rigidbodies)
@@ -135,9 +133,16 @@ public:
     }
     
     void setFile(ofFile file){
+        ofLogVerbose("--------------------------------------------------------------------------");
         ofLogVerbose("file set!!");
         fileLoaded = false;
+        // First clear the buffer..
+        csvBuffer.clear();
+        // then read the file into the buffer..
         csvBuffer = file.readToBuffer();
+        // set count to zero (espcially important is we load a second file)
+        count = 0;
+        
         
         // --> Figure out what is in the file and what we need to do ..
         
@@ -183,7 +188,12 @@ public:
             
         }
         
+
+        // CLEAR the MAPS
+        if(rigidbodies.size() > 0)  rigidbodies.clear();
+        if(skeletons.size() > 0)    skeletons.clear();
         
+
         // Loop through the collumns
         for(int i =0;i<typeMarkers.size();i++)
         {
@@ -219,6 +229,7 @@ public:
         // All the foun rigidbodies and skeletons are found now
         // we can start the thread that wil extract the content
         startThread();
+        
     }
     
     // return if the fil is already loaded
