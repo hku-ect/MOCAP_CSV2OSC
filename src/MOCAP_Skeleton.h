@@ -55,8 +55,6 @@ public:
             int startRot = startCollumn + bone.getStartCollumn();
             int startPos = startCollumn + bone.getStartCollumn() + 4;
             
-            //ofLogVerbose(bone.getName()+" --> startCollumn: "+ofToString(bone.getStartCollumn())+" startRot: "+ofToString(startRot)+" startPos: "+ofToString(startPos)+" length: "+ofToString(data.size()));
-            
             ofVec4f rotation(ofToFloat(data[startRot]),ofToFloat(data[startRot+1]),ofToFloat(data[startRot+2]),ofToFloat(data[startRot+3]));
             ofVec3f position(ofToFloat(data[startPos]),ofToFloat(data[startPos+1]),ofToFloat(data[startPos+2]));
 
