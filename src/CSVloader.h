@@ -122,7 +122,7 @@ public:
         
         // show meta info of the recording (when set)
         // TODO: fix absolute numbers
-        ofDrawBitmapString(info, ofGetWidth() - 250, 80);
+        ofDrawBitmapString(info, 550, 80);
         
         // show status of loading (when loading)
         if(fileLoaded == false){
