@@ -131,8 +131,8 @@ void ofApp::doFrame() {
     if(dataLoaded == true && playData == true){
         //ofLogVerbose("frame: "+ofToString(frameNum));
         
-        
-        ofxOscBundle bundleWithHiearchy,bundleNoHiearchy;
+        ofxOscBundle RigidBodiesWithHiearchy,RigidBodiesNoHiearchy;
+        ofxOscBundle SkeletonsWithHiearchy,SkeletonsNoHiearchy;
         
         // Loop through rigidbodies and calculate speed
         // Do this once every frame..
@@ -147,11 +147,11 @@ void ofApp::doFrame() {
         {
             ofxOscMessage ms1;
             rb.second.getOSCData(frameNum, &ms1, true, true);
-            bundleWithHiearchy.addMessage(ms1);
+            RigidBodiesWithHiearchy.addMessage(ms1);
             
             ofxOscMessage ms2;
             rb.second.getOSCData(frameNum, &ms2, false, true);
-            bundleNoHiearchy.addMessage(ms2);
+            RigidBodiesNoHiearchy.addMessage(ms2);
         }
         
         
@@ -164,27 +164,40 @@ void ofApp::doFrame() {
             
             // Add OSCmessages to the bundle
             for( ofxOscMessage m : messagesWithHierarchy){
-                bundleWithHiearchy.addMessage(m);
+                SkeletonsWithHiearchy.addMessage(m);
             }
             
             // WITHOUT HIEARCHY
             ofxOscMessage ms = sk.second.getOSCDataForBones(frameNum);
-            bundleNoHiearchy.addMessage(ms);
+            SkeletonsNoHiearchy.addMessage(ms);
         }
 
 
         //LOOP THROUGH ALL THE CLIENTS
         for (std::vector<client*>::iterator it = clients.begin() ; it != clients.end(); ++it)
         {
-            // send bundle with hiearchy
-            if( (*it)->getHierarchy() ){
             
-                (*it)->sendBundle(bundleWithHiearchy);
-                
+            // RIGID BODIES
+            if( (*it)->getRigid() ){
+                // send bundle with hiearchy
+                if( (*it)->getHierarchy() ){
+                    (*it)->sendBundle(RigidBodiesWithHiearchy);
+                }
+                // send bundle without hiearchy
+                else{
+                    (*it)->sendBundle(RigidBodiesNoHiearchy);
+                }
             }
-            // send bundle without hiearchy
-            else{
-                (*it)->sendBundle(bundleNoHiearchy);
+            
+            // SKELETONS
+            if( (*it)->getSkeleton() ){
+                if( (*it)->getHierarchy() ){
+                    (*it)->sendBundle(SkeletonsWithHiearchy);
+                }
+                // send bundle without hiearchy
+                else{
+                    (*it)->sendBundle(SkeletonsNoHiearchy);
+                }
             }
         }
          
