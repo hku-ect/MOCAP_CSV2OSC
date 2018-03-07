@@ -133,7 +133,6 @@ public:
     }
     
     void setFile(ofFile file){
-        ofLogVerbose("--------------------------------------------------------------------------");
         ofLogVerbose("file set!!");
         fileLoaded = false;
         // First clear the buffer..
