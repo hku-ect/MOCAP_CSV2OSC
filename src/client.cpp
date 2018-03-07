@@ -96,9 +96,9 @@ void client::draw()
 
     ofSetColor(255,255,255);
     verdana14.drawString(msg, 20, 20);
-    //verdana14.drawString("Rigid", 30, 50);
+    verdana14.drawString("Rigid", 30, 50);
     //verdana14.drawString("Mark", 100, 50);
-    //verdana14.drawString("Skel", 170, 50);
+    verdana14.drawString("Skel", 170, 50);
     verdana14.drawString("Hierarchy", 230, 50);
     
     ofPopMatrix();
@@ -111,19 +111,19 @@ void client::drawGUI()
     ofDrawRectangle(0,0,area.getWidth(),area.getHeight());
     ofFill();
     
-    /*
+    
     if (!isRigid) ofSetColor(255, 0, 0);
     else ofSetColor(0,255,0);
     ofDrawRectangle(rigButton);
-    
+    /*
     if (!isMarker) ofSetColor(255, 0, 0);
     else ofSetColor(0,255,0);
     ofDrawRectangle(markButton);
-
+     */
     if (!isSkeleton) ofSetColor(255, 0, 0);
     else ofSetColor(0,255,0);
     ofDrawRectangle(skelButton);
-    */
+    
     
     if (!deepHierarchy) ofSetColor(255, 0, 0);
     else ofSetColor(0,255,0);
