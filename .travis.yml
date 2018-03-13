@@ -35,7 +35,7 @@ matrix:
 
 # Linux 64bit, OF stable:  Not supported yet
   - os: linux
-    dist: trusty
+    dist: xenial
     sudo: required
     env: TARGET="linux64" OF_BRANCH="stable" OF_ROOT="~/openFrameworks"
     addons:
