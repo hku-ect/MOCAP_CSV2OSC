@@ -191,7 +191,7 @@ install:
   - git clone --depth=1 --branch=$OF_BRANCH https://github.com/openframeworks/openFrameworks
   - cd openFrameworks
 #  - scripts/ci/$TRAVIS_OS_NAME/install.sh
-  - $ROOT/scripts/linux/ubuntu/install_dependencies.sh -y
+  - $OF_ROOT/scripts/linux/ubuntu/install_dependencies.sh -y
 
 script:
 #  - scripts/ci/addons/build.sh
