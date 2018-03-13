@@ -195,7 +195,8 @@ install:
 
 script:
 #  - scripts/ci/addons/build.sh
-  - make 
+  - cd ~/$TRAVIS_REPO_SLUG
+  - make
 
 git:
   depth: 10
