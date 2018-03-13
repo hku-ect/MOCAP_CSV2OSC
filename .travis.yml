@@ -191,7 +191,10 @@ install:
   - cd openFrameworks
 #  - scripts/ci/$TRAVIS_OS_NAME/install.sh
   - sudo scripts/linux/ubuntu/install_dependencies.sh -y
-  - scripts/linux/compileOF.sh
+#  - scripts/linux/compileOF.sh
+  - cd libs/openFrameworksCompiled/project
+  - make Debug
+  - make Release
 
 script:
 #  - scripts/ci/addons/build.sh
