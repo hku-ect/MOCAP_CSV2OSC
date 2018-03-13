@@ -34,17 +34,17 @@ matrix:
 #          - gdb
 
 # Linux 64bit, OF stable:  Not supported yet
-#  - os: linux
-#    dist: trusty
-#    sudo: required
-#    env: TARGET="linux64" OF_BRANCH="stable" OF_ROOT="~/openFrameworks"
-#    addons:
-#      apt:
-#        sources:
-#          - ubuntu-toolchain-r-test
-#        packages:
-#          - gcc-4.9
-#          - g++-4.9
+  - os: linux
+    dist: trusty
+    sudo: required
+    env: TARGET="linux64" OF_BRANCH="stable"
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+          - gcc-4.9
+          - g++-4.9
 
 # OSX, OF master
 #  - os: osx
@@ -195,18 +195,19 @@ install:
 #  - scripts/linux/compileOF.sh
   - cd libs/openFrameworksCompiled/project
   - make Debug
-  - make Release
+#  - make Release
 
 script:
 #  - scripts/ci/addons/build.sh
   - cd $TRAVIS_BUILD_DIR
   - echo "OF_ROOT=$HOME/openFrameworks" >> config.make
-  - make
+  - make Debug
 
 git:
   depth: 10
 
-#after_success:
-#  - cd bin
+after_success:
+  - cd bin
+  - find .
 #  - zip -r $( $TRAVIS_REPO_SLUG | cut -d"/" -f2)_${TRAVIS_OS_NAME}.zip *
 #  - cd ..
