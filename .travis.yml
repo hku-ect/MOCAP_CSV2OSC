@@ -45,7 +45,6 @@ matrix:
         packages:
           - gcc-4.9
           - g++-4.9
-          - gdb
 
 # OSX, OF master
 #  - os: osx
@@ -192,9 +191,6 @@ install:
   - cd openFrameworks
 #  - scripts/ci/$TRAVIS_OS_NAME/install.sh
   - sudo scripts/linux/ubuntu/install_dependencies.sh -y
-  - if [ "$TARGET" == "linux64" ]; then
-      scripts/linux/download_libs.sh -a 64gcc4;
-    fi
   - scripts/linux/compileOF.sh
 
 script:
