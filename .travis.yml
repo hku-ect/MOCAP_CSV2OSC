@@ -195,7 +195,7 @@ install:
 
 script:
 #  - scripts/ci/addons/build.sh
-  - cd ~/$TRAVIS_REPO_SLUG
+  - cd $TRAVIS_BUILD_DIR
   - make
 
 git:
