@@ -35,7 +35,7 @@ matrix:
 
 # Linux 64bit, OF stable:  Not supported yet
   - os: linux
-    dist: xenial
+    dist: trusty
     sudo: required
     env: TARGET="linux64" OF_BRANCH="stable" OF_ROOT="~/openFrameworks"
     addons:
@@ -192,6 +192,9 @@ install:
   - cd openFrameworks
 #  - scripts/ci/$TRAVIS_OS_NAME/install.sh
   - sudo scripts/linux/ubuntu/install_dependencies.sh -y
+  - if [ "$TARGET" == "linux64" ]; then
+      scripts/linux/download_libs.sh -a 64gcc4;
+    fi
   - scripts/linux/compileOF.sh
 
 script:
