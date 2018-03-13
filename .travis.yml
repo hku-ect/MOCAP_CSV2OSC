@@ -200,6 +200,7 @@ install:
 script:
 #  - scripts/ci/addons/build.sh
   - cd $TRAVIS_BUILD_DIR
+  - echo "OF_ROOT=~/openFrameworks" >> config.make
   - make
 
 git:
