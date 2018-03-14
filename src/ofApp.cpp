@@ -348,8 +348,9 @@ void ofApp::addClient(int i,string ip,int p,string n,bool r,bool m,bool s, bool 
 void ofApp::deleteClient(int &index)
 {
     ofRemoveListener(clients[index]->deleteClient, this, &ofApp::deleteClient);
-    delete clients[index];
-    clients.erase(clients.begin() + index);
+	int indexToRemove = index;
+	delete clients[indexToRemove];
+	clients.erase(clients.begin() + indexToRemove); 
     for (int i = 0; i < clients.size(); i++)
     {
         clients[i]->rearangePosition(i,true);
