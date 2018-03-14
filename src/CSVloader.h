@@ -56,18 +56,10 @@ public:
     {
         while(isThreadRunning())
         {
-            
-            // Read File
-            string currentLine = ""; // empty for the moment
-            
-            
-            // While we have not yet reached the end of the file
-            if (! csvBuffer.isLastLine()) {
-                
-                if(lock()){ // get lock
-                    
-                    // get next line
-                    currentLine = csvBuffer.getNextLine();
+                      
+            // Loop through the file
+            for (auto currentLine : csvBuffer.getLines()) {
+
                     // split line in chunks (use the ,
                     vector<string> data = ofSplitString(currentLine, ",");
                     
@@ -88,30 +80,16 @@ public:
                             sk.second.addSkeletonEntry(data);
                         }
                     }
-                    
-                    // clear the lock
-                    unlock();
-                    
+                
                     // increase the count
                     count++;
 
-                }
-                else
-                {
-                    // If we reach this else statement, it means that we could not
-                    // lock our mutex, and so we do not need to call unlock().
-                    // Calling unlock without locking will lead to problems.
-                    ofLogWarning("threadedFunction()") << "Unable to lock mutex.";
-                }
-
             }
-            // We have reached th eend of the file
-            // stop the thread and set the fiel laoded flag to true
-            else{
-                ofLogVerbose("stopping thread");
-                fileLoaded = true;
-                stopThread();
-            }
+            // We have reached the end of the file
+            // stop the thread and set the file laoded flag to true
+            ofLogVerbose("stopping thread");
+			stopThread();
+			fileLoaded = true;
         }
     }
     

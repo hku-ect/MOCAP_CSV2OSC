@@ -111,43 +111,6 @@ public:
             m.addFloatArg(rotation.z());
             m.addFloatArg(rotation.w());
             
-            
-            // --> ADD SPEED
-            // num frames used to calculate speed
-            int const numFrames = 10;
-            
-            ofVec3f positionSpeed(0,0,0);
-            ofVec3f rotationSpeed(0,0,0);
-            for(int i = 0; i < numFrames; i++){
-                
-                positionSpeed.x += abs(bone.getPosition(frame).x - bone.getPosition(frame-1).x);
-                positionSpeed.y += abs(bone.getPosition(frame).y - bone.getPosition(frame-1).y);
-                positionSpeed.z += abs(bone.getPosition(frame).z - bone.getPosition(frame-1).z);
-                
-                ofVec3f rotNow = bone.getRotation(frame).getEuler();
-                ofVec3f rotPrev = bone.getRotation(frame-1).getEuler();
-                
-                rotationSpeed.x += abs(rotNow.x - rotPrev.x);
-                rotationSpeed.y += abs(rotNow.y - rotPrev.y);
-                rotationSpeed.z += abs(rotNow.z - rotPrev.z);
-                
-                
-            }
-            
-            positionSpeed = positionSpeed/numFrames;
-            rotationSpeed = rotationSpeed/numFrames;
-            
-            
-            // position speed
-            m.addFloatArg(positionSpeed.x);
-            m.addFloatArg(positionSpeed.y);
-            m.addFloatArg(positionSpeed.z);
-            
-            // rotation speed
-            m.addFloatArg(rotationSpeed.x);
-            m.addFloatArg(rotationSpeed.y);
-            m.addFloatArg(rotationSpeed.z);
-            
             messages.push_back(m);
 
         }
