@@ -10,6 +10,9 @@
 # scripts/ci/$TARGET/install.sh
 #
 
+env:
+  global:
+    secure: "JiIyYgiH5TgkUN9xkZSfsAWOLw4n4KnVxt4ZcqLTEbcnSXmWi8dE3W0vWw5Aq3Ckyjidhest3izZdP9AVoyowfTCd6JijiZguQ2lDui/0QBDzY0EjyJ5+vGcd8LVFEquKMPt0dnm3nPeeZwkh+8eAFrhfIdlx/5KUJ+lggYA2rdtirkODxWOY4E1Q89HuBQ7e/TiwFkWN04he3fCQYw9KwBobILByyQXobFJ4jHvm7Ob7kDOSuoC7fuMzgC1U78WT/58WFQCbbVseEaMzudHNEcjd3pji5CJsLhcLbrsHKyvkloLCUkrGr9/2fTkrx+NfA3YYbbGOajA4dVhckZl9TohRhXgonaZEYQ8tizQnQhqzjzjK1ZQt2PRBWqmmFrdN5gAhZ218nyl/KSrri5z/pERq8hwtfxTRwzG1QxUdu7xxOUC8Y0iO1vB43f8+JSpRg4R34E87rNlvrcECgEAboOUEWIP11lj6yI9B3onIPjgCm9zf2RIPd4LyJVL3Dusz56wNH3FOXwOSodh62HufYEB6Y/DBPV85DHyDhie6n54l2OaOZgRbvzPcnh/WPDtPQu8/+fTNUYJvk+0uzFvWTWS9o8DfYYAPNmphS5L0Crzxku6S7SVBtHxgjkidobgJxtRZqavqJ1NFLGzReZl6L5tacSbi/XnjhlsVCX++OI="
 
 language: c++
 compiler: gcc
@@ -215,6 +218,7 @@ script:
   - if [ "$TARGET" == "linux64" ]; then
        make Debug;
     elif [ "$TARGET" == "osx" ]; then
+       sed -i "s;..\/..\/..;$HOME\/openFrameworks;g" Project.xcconfig;
        xcodebuild -configuration Release -target MOCAP_CSV2OSC -project "MOCAP_CSV2OSC.xcodeproj";
     fi
 
