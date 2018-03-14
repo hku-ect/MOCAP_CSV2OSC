@@ -191,19 +191,23 @@ install:
   - cd openFrameworks
 #  - scripts/ci/$TRAVIS_OS_NAME/install.sh
   - if [ "$TARGET" == "linux64" ]; then 
-      sudo scripts/linux/ubuntu/install_dependencies.sh -y
-      if [ -f scripts/linux/download_libs.sh ]; then scripts/linux/download_libs.sh; fi
+      sudo scripts/linux/ubuntu/install_dependencies.sh -y;
+      if [ -f scripts/linux/download_libs.sh ]; then 
+        scripts/linux/download_libs.sh; 
+      fi
     elif [ "$TARGET" == "osx" ]; then
-      brew update
+      brew update;
 #      brew install gdb
 #      brew install ccache
-      brew upgrade coreutils
-      if [ -f scripts/$TARGET/download_libs.sh ]; then scripts/$TARGET/download_libs.sh; fi
+      brew upgrade coreutils;
+      if [ -f scripts/$TARGET/download_libs.sh ]; then 
+        scripts/$TARGET/download_libs.sh; 
+      fi
     fi
 #  - scripts/linux/compileOF.sh
   - if [ "$TARGET" == "linux64" ]; then
-      cd libs/openFrameworksCompiled/project
-      make Debug
+      cd libs/openFrameworksCompiled/project;
+      make Debug;
       #make Release
     fi
 
@@ -212,9 +216,9 @@ script:
   - cd $TRAVIS_BUILD_DIR
   - echo "OF_ROOT=$HOME/openFrameworks" >> config.make
   - if [ "$TARGET" == "linux64" ]; then
-       make Debug
+       make Debug;
     elif [ "$TARGET" == "osx" ]; then
-       xcodebuild -configuration Release -target MOCAP_CSV2OSC -project "MOCAP_CSV2OSC.xcodeproj"
+       xcodebuild -configuration Release -target MOCAP_CSV2OSC -project "MOCAP_CSV2OSC.xcodeproj";
     fi
 
 git:
