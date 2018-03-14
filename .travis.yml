@@ -191,21 +191,21 @@ install:
   - cd openFrameworks
 # fails so we do it ourselves - scripts/ci/$TRAVIS_OS_NAME/install.sh
   - if [ "$TARGET" == "linux64" ]; then 
-      sudo scripts/linux/ubuntu/install_dependencies.sh -y
+      sudo scripts/linux/ubuntu/install_dependencies.sh -y;
       if [ -f scripts/linux/download_libs.sh ]; then 
-        scripts/linux/download_libs.sh
+        scripts/linux/download_libs.sh;
       fi
     elif [ "$TARGET" == "osx" ]; then
-      brew update
-      brew upgrade coreutils
+      brew update;
+      brew upgrade coreutils;
       if [ -f scripts/$TARGET/download_libs.sh ]; then 
-        scripts/$TARGET/download_libs.sh
+        scripts/$TARGET/download_libs.sh;
       fi
     fi
   - scripts/linux/compileOF.sh
   - if [ "$TARGET" == "linux64" ]; then
-      cd libs/openFrameworksCompiled/project
-      make Debug
+      cd libs/openFrameworksCompiled/project;
+      make Debug;
     fi
 
 script:
