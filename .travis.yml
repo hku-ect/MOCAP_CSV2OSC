@@ -203,7 +203,7 @@ install:
     elif [ "$TARGET" == "osx" ]; then
       brew update;
       brew upgrade coreutils;
-      brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb
+      brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb;
       if [ -f scripts/$TARGET/download_libs.sh ]; then 
         scripts/$TARGET/download_libs.sh;
       fi
