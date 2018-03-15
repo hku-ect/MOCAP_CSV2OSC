@@ -10,7 +10,9 @@
 # scripts/ci/$TARGET/install.sh
 #
 
-
+env:
+  global:
+    secure: "QcATaD+YIY33DabRIv6OMIAc4ChxRFO3lQJqsr4CeehDR8JgkqcRsHdamk6H8EfWlTltVtPGehTTPqXkjd9LCuyfC9AH1/uaNVaQnS6FhDb6846gAEjUPrwrpmNMHE+nugmGz0vUhX1KGus5zMDkmuXQrR9Bdqhneu3yJmxXWwl6P1ATPSgReAntqcWgLPv8SXre4rSieR1lZGOOpRF7TJrL7R1vw/v//pgmLVdWfNz1p0sPW1whOtSZOhRWccnscOO/0tZ4y0S7le0eWyr9VzXS7n0Xst9HGUBwRb0vI1V8/FD774our2P2oyjB1/Hrt4AUr3JnPMdrLUXji8mZ1fPvHWPgLbPxOmiF7Hn8Wd7ZyUKuNJzObu3LeodX2yjJUL6CJxBofKiJW8F0hpFgJeBW8vSnkqs7Tqo4dw8+X28hMBqR0f0sIMqA94nSfjsgpTAna75lxkNXCXA7LUWcy5lJ/RlAQXtqwGVejids8hVDbR/S8tG4pig1HBkk1AeP8Bbzk2r+1a4VTsPxpe4uVPm1fEz7bq2iRRG7rquYJ+y5sUIdxkBcULXXgYImr93+0nnkhBNlePP2DgYZV/jytr4Kuwq5f9xhPi7f8/9v8duRQhXvbwe4DbP7eO9DRYxT4Vjlrym9THxXPf8e/PFsVw9IAFRaPzkmaIcfyKRv3og="
 language: c++
 compiler: gcc
 sudo: true
@@ -25,32 +27,38 @@ matrix:
     sudo: required
     env: TARGET="linux64" OF_BRANCH="master"
     addons:
+      ssh_known_hosts: pong.hku.nl
       apt:
         sources:
           - ubuntu-toolchain-r-test
         packages:
           - gcc-4.9
           - g++-4.9
+          - sshpass
 #          - gdb
 
-# Linux 64bit, OF stable:  Not supported yet
+# Linux 64bit, OF stable
   - os: linux
     dist: trusty
     sudo: required
     env: TARGET="linux64" OF_BRANCH="stable"
     addons:
+      ssh_known_hosts: pong.hku.nl
       apt:
         sources:
           - ubuntu-toolchain-r-test
         packages:
           - gcc-4.9
           - g++-4.9
+          - sshpass
 
 # OSX, OF master
-#  - os: osx
+  - os: osx
 #    osx_image: xcode8
-#    compiler: clang
-#    env: TARGET="osx" OF_BRANCH="master"
+    compiler: clang
+    env: TARGET="osx" OF_BRANCH="stable"
+    addons:
+      ssh_known_hosts: pong.hku.nl
 
 # OSX, OF stable:  Not supported yet
 #  - os: osx
@@ -189,25 +197,65 @@ install:
   - cd ~
   - git clone --depth=1 --branch=$OF_BRANCH https://github.com/openframeworks/openFrameworks
   - cd openFrameworks
-#  - scripts/ci/$TRAVIS_OS_NAME/install.sh
-  - sudo scripts/linux/ubuntu/install_dependencies.sh -y
-  - if [ -f scripts/linux/download_libs.sh ]; then scripts/linux/download_libs.sh; fi
+# fails so we do it ourselves - scripts/ci/$TRAVIS_OS_NAME/install.sh
+  - if [ "$TARGET" == "linux64" ]; then 
+      sudo scripts/linux/ubuntu/install_dependencies.sh -y;
+      if [ -f scripts/linux/download_libs.sh ]; then 
+        scripts/linux/download_libs.sh;
+      fi
+    elif [ "$TARGET" == "osx" ]; then
+      brew update;
+      brew upgrade coreutils;
+      brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb;
+      if [ -f scripts/$TARGET/download_libs.sh ]; then 
+        scripts/$TARGET/download_libs.sh;
+      fi
+    fi
 #  - scripts/linux/compileOF.sh
-  - cd libs/openFrameworksCompiled/project
-  - make Debug
-#  - make Release
+  - if [ "$TARGET" == "linux64" ]; then
+      cd libs/openFrameworksCompiled/project;
+      make Debug;
+    fi
 
 script:
 #  - scripts/ci/addons/build.sh
   - cd $TRAVIS_BUILD_DIR
   - echo "OF_ROOT=$HOME/openFrameworks" >> config.make
-  - make Debug
+#  - sed -i '' "s;..\/..\/..;$HOME\/openFrameworks;g" Project.xcconfig
+#  - sed -i '' "s;..\/..\/..;$HOME\/openFrameworks;g" MOCAP_CSV2OSC.xcodeproj/project.pbxproj
+  - if [ "$TARGET" == "linux64" ]; then
+       make Debug;
+    elif [ "$TARGET" == "osx" ]; then
+       cd ..;
+       mv MOCAP_CSV2OSC ~/openFrameworks/apps/devApps/;
+       cd ~/openFrameworks/apps/devApps/MOCAP_CSV2OSC;
+       xcodebuild -configuration Release -target MOCAP_CSV2OSC -project "MOCAP_CSV2OSC.xcodeproj";
+       cd ..; mv MOCAP_CSV2OSC $TRAVIS_BUILD_DIR; cd $TRAVIS_BUILD_DIR;
+    fi
 
 git:
   depth: 10
 
 after_success:
-  - cd bin
-  - find .
-#  - zip -r $( $TRAVIS_REPO_SLUG | cut -d"/" -f2)_${TRAVIS_OS_NAME}.zip *
-#  - cd ..
+  - cd bin; pwd
+  - if [[ $TRAVIS_PULL_REQUEST == "false" ]]; then 
+      if [ -n "$TRAVIS_TAG" ]; then
+        zip -r $( echo $TRAVIS_REPO_SLUG | cut -d"/" -f2)_${TRAVIS_OS_NAME}_$TRAVIS_TAG.zip *;
+      else
+        zip -r $( echo $TRAVIS_REPO_SLUG | cut -d"/" -f2)_${TRAVIS_OS_NAME}_$TRAVIS_COMMIT.zip *;
+      fi
+    fi
+  - if [[ $TRAVIS_PULL_REQUEST == "false" ]]; then export SSHPASS=$BBPWD; fi
+  - if [[ $TRAVIS_PULL_REQUEST == "false" ]]; then sshpass -e scp -o stricthostkeychecking=no *.zip buildbot@pong.hku.nl:public_html/nightly/; fi
+  - cd ..
+
+deploy:
+  provider: releases
+  api_key:
+    secure: b1QTGdFh3/wK84wGAhRbs9IqtioII7C1FHz0yBUesQIqKfrxCqt2BpsZSqmUxgDqIReIIBt1aGGl7ifzE6TWC5nKzOnfDgfPJwLKrJmsTzDNO+FB2LuDWF4WNFoTMKPZTdzkxPzXJZfXYzc6THibJ6JjfhCttwDkrjyTEY2dz+7s4IYdOkerboHXKxAykAEz+Uy4VA4yN7Np/d7Xu1t7ql5cVnGyP7eIK31MDQd6FxqXHp3JKYzx5laMRjEqpMbCNlU/USFCkbb5XrdrASxCzX5mOInnydkeHnEtNaYRzNZFKW1eW6aQpY6fq/ALHW8d3nn8Ag2ikMThbNM0+soyrmafx+aXI5FJmM+nGPQAKwyf3nkqHOzb4ZP64qlK83DV/K8YjH+vPofsYf9f27sPzTceWHYC42+ZP9RG+JYYJh86/GGbziPdseQo8lizL7vT7CtVFbMQLWxyOjYyYjeWmAmArJXjgQEFFtbH9KY49vfSWtFeETfnAhT6yKtdxHjH7PICZUcigLMvheqKONb9XCUQTHU0HU8WNSHfnnKAkiVD5irvZQqheuJlMivlKA9QJeGmyBUd/cLYiga4uvOKDLptg4UPYrJsqgK8nTGuDbNrguec6NYVuhCqy3eI2mZgng1xb5OEXqIWmDfnQjnI1R4k1rgm15P8EDE23oaEJuU=
+  file_glob: true
+  file: bin/*.zip
+  skip_cleanup: true
+  overwrite: true
+  on:
+    tags: true
