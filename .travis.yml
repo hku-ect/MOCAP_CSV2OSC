@@ -239,8 +239,24 @@ git:
 
 after_success:
   - cd bin; pwd
-  - find .
-  - zip -r $( echo $TRAVIS_REPO_SLUG | cut -d"/" -f2)_${TRAVIS_OS_NAME}_$TRAVIS_COMMIT.zip *
-  - export SSHPASS=$BBPWD
-  - sshpass -e scp -o stricthostkeychecking=no *.zip buildbot@pong.hku.nl:public_html/nightly/
-#  - cd ..
+  - if [[ $TRAVIS_PULL_REQUEST == "false" ]]; then 
+      if [ -n "$TRAVIS_TAG" ]; then
+        zip -r $( echo $TRAVIS_REPO_SLUG | cut -d"/" -f2)_${TRAVIS_OS_NAME}_$TRAVIS_COMMIT.zip *;
+      else
+        zip -r $( echo $TRAVIS_REPO_SLUG | cut -d"/" -f2)_${TRAVIS_OS_NAME}_$TRAVIS_TAG.zip *;
+      fi
+    fi
+  - if [[ $TRAVIS_PULL_REQUEST == "false" ]]; then export SSHPASS=$BBPWD; fi
+  - if [[ $TRAVIS_PULL_REQUEST == "false" ]]; then sshpass -e scp -o stricthostkeychecking=no *.zip buildbot@pong.hku.nl:public_html/nightly/; fi
+  - cd ..
+
+deploy:
+  provider: releases
+  api_key:
+    secure: b1QTGdFh3/wK84wGAhRbs9IqtioII7C1FHz0yBUesQIqKfrxCqt2BpsZSqmUxgDqIReIIBt1aGGl7ifzE6TWC5nKzOnfDgfPJwLKrJmsTzDNO+FB2LuDWF4WNFoTMKPZTdzkxPzXJZfXYzc6THibJ6JjfhCttwDkrjyTEY2dz+7s4IYdOkerboHXKxAykAEz+Uy4VA4yN7Np/d7Xu1t7ql5cVnGyP7eIK31MDQd6FxqXHp3JKYzx5laMRjEqpMbCNlU/USFCkbb5XrdrASxCzX5mOInnydkeHnEtNaYRzNZFKW1eW6aQpY6fq/ALHW8d3nn8Ag2ikMThbNM0+soyrmafx+aXI5FJmM+nGPQAKwyf3nkqHOzb4ZP64qlK83DV/K8YjH+vPofsYf9f27sPzTceWHYC42+ZP9RG+JYYJh86/GGbziPdseQo8lizL7vT7CtVFbMQLWxyOjYyYjeWmAmArJXjgQEFFtbH9KY49vfSWtFeETfnAhT6yKtdxHjH7PICZUcigLMvheqKONb9XCUQTHU0HU8WNSHfnnKAkiVD5irvZQqheuJlMivlKA9QJeGmyBUd/cLYiga4uvOKDLptg4UPYrJsqgK8nTGuDbNrguec6NYVuhCqy3eI2mZgng1xb5OEXqIWmDfnQjnI1R4k1rgm15P8EDE23oaEJuU=
+  file_glob: true
+  file: bin/*.zip
+  skip_cleanup: true
+  overwrite: true
+  on:
+    tags: true
