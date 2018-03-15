@@ -220,10 +220,12 @@ script:
   - if [ "$TARGET" == "linux64" ]; then
        make Debug;
     elif [ "$TARGET" == "osx" ]; then
-       cd ..
-       mv MOCAP_CSV2OSC ~/openFrameworks/apps/devApps/
-       cd ~/openFrameworks/apps/devApps/MOCAP_CSV2OSC
+       cd ..;
+       mv MOCAP_CSV2OSC ~/openFrameworks/apps/devApps/;
+       cd ~/openFrameworks/apps/devApps/MOCAP_CSV2OSC;
        xcodebuild -configuration Release -target MOCAP_CSV2OSC -project "MOCAP_CSV2OSC.xcodeproj";
+       cd ..; mv MOCAP_CSV2OSC $TRAVIS_BUILD_DIR; cd $TRAVIS_BUILD_DIR;
+       find .;
     fi
 
 git:
