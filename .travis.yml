@@ -215,7 +215,7 @@ script:
 #  - scripts/ci/addons/build.sh
   - cd $TRAVIS_BUILD_DIR
   - echo "OF_ROOT=$HOME/openFrameworks" >> config.make
-  - sed -i "s;..\/..\/..;$HOME\/openFrameworks;g" Project.xcconfig
+  - sed -i '' "s;..\/..\/..;$HOME\/openFrameworks;g" Project.xcconfig
   - if [ "$TARGET" == "linux64" ]; then
        make Debug;
     elif [ "$TARGET" == "osx" ]; then
