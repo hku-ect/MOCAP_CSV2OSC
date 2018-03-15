@@ -13,8 +13,6 @@
 env:
   global:
     secure: "JiIyYgiH5TgkUN9xkZSfsAWOLw4n4KnVxt4ZcqLTEbcnSXmWi8dE3W0vWw5Aq3Ckyjidhest3izZdP9AVoyowfTCd6JijiZguQ2lDui/0QBDzY0EjyJ5+vGcd8LVFEquKMPt0dnm3nPeeZwkh+8eAFrhfIdlx/5KUJ+lggYA2rdtirkODxWOY4E1Q89HuBQ7e/TiwFkWN04he3fCQYw9KwBobILByyQXobFJ4jHvm7Ob7kDOSuoC7fuMzgC1U78WT/58WFQCbbVseEaMzudHNEcjd3pji5CJsLhcLbrsHKyvkloLCUkrGr9/2fTkrx+NfA3YYbbGOajA4dVhckZl9TohRhXgonaZEYQ8tizQnQhqzjzjK1ZQt2PRBWqmmFrdN5gAhZ218nyl/KSrri5z/pERq8hwtfxTRwzG1QxUdu7xxOUC8Y0iO1vB43f8+JSpRg4R34E87rNlvrcECgEAboOUEWIP11lj6yI9B3onIPjgCm9zf2RIPd4LyJVL3Dusz56wNH3FOXwOSodh62HufYEB6Y/DBPV85DHyDhie6n54l2OaOZgRbvzPcnh/WPDtPQu8/+fTNUYJvk+0uzFvWTWS9o8DfYYAPNmphS5L0Crzxku6S7SVBtHxgjkidobgJxtRZqavqJ1NFLGzReZl6L5tacSbi/XnjhlsVCX++OI="
-addons:
-  ssh_known_hosts: pong.hku.nl
 
 language: c++
 compiler: gcc
@@ -30,32 +28,38 @@ matrix:
     sudo: required
     env: TARGET="linux64" OF_BRANCH="master"
     addons:
+      ssh_known_hosts: pong.hku.nl
       apt:
         sources:
           - ubuntu-toolchain-r-test
         packages:
           - gcc-4.9
           - g++-4.9
+          - sshpass
 #          - gdb
 
-# Linux 64bit, OF stable:  Not supported yet
+# Linux 64bit, OF stable
   - os: linux
     dist: trusty
     sudo: required
     env: TARGET="linux64" OF_BRANCH="stable"
     addons:
+      ssh_known_hosts: pong.hku.nl
       apt:
         sources:
           - ubuntu-toolchain-r-test
         packages:
           - gcc-4.9
           - g++-4.9
+          - sshpass
 
 # OSX, OF master
   - os: osx
 #    osx_image: xcode8
     compiler: clang
     env: TARGET="osx" OF_BRANCH="stable"
+    addons:
+      ssh_known_hosts: pong.hku.nl
 
 # OSX, OF stable:  Not supported yet
 #  - os: osx
@@ -228,7 +232,6 @@ script:
        cd ~/openFrameworks/apps/devApps/MOCAP_CSV2OSC;
        xcodebuild -configuration Release -target MOCAP_CSV2OSC -project "MOCAP_CSV2OSC.xcodeproj";
        cd ..; mv MOCAP_CSV2OSC $TRAVIS_BUILD_DIR; cd $TRAVIS_BUILD_DIR;
-       pwd;
     fi
 
 git:
@@ -237,7 +240,7 @@ git:
 after_success:
   - cd bin; pwd
   - find .
-  - zip -r $( $TRAVIS_REPO_SLUG | cut -d"/" -f2)_${TRAVIS_OS_NAME}.zip *
+  - zip -r $( echo $TRAVIS_REPO_SLUG | cut -d"/" -f2)_${TRAVIS_OS_NAME}_$TRAVIS_COMMIT.zip *
   - export SSHPASS=$BBPWD
   - sshpass -e scp -o stricthostkeychecking=no *.zip buildbot@pong.hku.nl:public_html/nightly/
 #  - cd ..
