@@ -215,11 +215,14 @@ script:
 #  - scripts/ci/addons/build.sh
   - cd $TRAVIS_BUILD_DIR
   - echo "OF_ROOT=$HOME/openFrameworks" >> config.make
-  - sed -i '' "s;..\/..\/..;$HOME\/openFrameworks;g" Project.xcconfig
-  - sed -i '' "s;..\/..\/..;$HOME\/openFrameworks;g" MOCAP_CSV2OSC.xcodeproj/project.pbxproj
+#  - sed -i '' "s;..\/..\/..;$HOME\/openFrameworks;g" Project.xcconfig
+#  - sed -i '' "s;..\/..\/..;$HOME\/openFrameworks;g" MOCAP_CSV2OSC.xcodeproj/project.pbxproj
   - if [ "$TARGET" == "linux64" ]; then
        make Debug;
     elif [ "$TARGET" == "osx" ]; then
+       cd ..
+       mv MOCAP_CSV2OSC ~/openFrameworks/apps/devApps/
+       cd ~/openFrameworks/apps/devApps/MOCAP_CSV2OSC
        xcodebuild -configuration Release -target MOCAP_CSV2OSC -project "MOCAP_CSV2OSC.xcodeproj";
     fi
 
