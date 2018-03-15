@@ -216,6 +216,7 @@ script:
   - cd $TRAVIS_BUILD_DIR
   - echo "OF_ROOT=$HOME/openFrameworks" >> config.make
   - sed -i '' "s;..\/..\/..;$HOME\/openFrameworks;g" Project.xcconfig
+  - sed -i '' "s;..\/..\/..;$HOME\/openFrameworks;g" MOCAP_CSV2OSC.xcodeproj/project.pbxproj
   - if [ "$TARGET" == "linux64" ]; then
        make Debug;
     elif [ "$TARGET" == "osx" ]; then
