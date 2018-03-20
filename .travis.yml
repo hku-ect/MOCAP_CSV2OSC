@@ -246,7 +246,7 @@ after_success:
       fi
     fi
   - if [[ $TRAVIS_PULL_REQUEST == "false" ]]; then export SSHPASS=$BBPWD; fi
-  - if [[ $TRAVIS_PULL_REQUEST == "false" ]]; then sshpass -e scp -o stricthostkeychecking=no *.zip buildbot@pong.hku.nl:public_html/nightly/; fi
+  - if [[ $TRAVIS_PULL_REQUEST == "false" ]]; then sshpass -e scp *.zip buildbot@pong.hku.nl:public_html/nightly/; fi
   - cd ..
 
 deploy:
