@@ -28,8 +28,10 @@ public:
         
         // Create Bones based on predefined definition
         int i = 0;
-        for(const string &bonename : boneNames){
+        for(const string &bone : boneNames){
             
+            //Set the bonename to be the same as in Motive
+            string bonename = name+"_"+bone;
             cout << "bonename: " << bonename << " bone num: "<< boneNum[i] << endl;
             
             // create markers
