@@ -23,7 +23,7 @@
  
  Name: CSVloader
  Description:
- This class loads in it's own thread the CSV file and returns the laoded data 
+ This class loads in it's own thread the CSV file and returns the laoded data
  to the main thread to be used.
  
  */
@@ -56,40 +56,40 @@ public:
     {
         while(isThreadRunning())
         {
-                      
+            
             // Loop through the file
             for (auto currentLine : csvBuffer.getLines()) {
-
-                    // split line in chunks (use the ,
-                    vector<string> data = ofSplitString(currentLine, ",");
-                    
-                    // get the data from the file
-                    // starting form line 7 the data starts
-                    if(count > 6 && currentLine != ""){
-                        //ofLogVerbose("Frame: "+ofToString(data[0])+" time: "+data[1]);
-                        
-                        // loop through rigid bodies
-                        for (auto & rb : rigidbodies)
-                        {
-                            rb.second.addMarkerEntry(data);
-                        }
-                        
-                        // loop through skeletons
-                        for (auto & sk : skeletons)
-                        {
-                            sk.second.addSkeletonEntry(data);
-                        }
-                    }
                 
-                    // increase the count
-                    count++;
-
+                // split line in chunks (use the ,
+                vector<string> data = ofSplitString(currentLine, ",");
+                
+                // get the data from the file
+                // starting form line 7 the data starts
+                if(count > 6 && currentLine != ""){
+                    //ofLogVerbose("Frame: "+ofToString(data[0])+" time: "+data[1]);
+                    
+                    // loop through rigid bodies
+                    for (auto & rb : rigidbodies)
+                    {
+                        rb.second.addMarkerEntry(data);
+                    }
+                    
+                    // loop through skeletons
+                    for (auto & sk : skeletons)
+                    {
+                        sk.second.addSkeletonEntry(data);
+                    }
+                }
+                
+                // increase the count
+                count++;
+                
             }
             // We have reached the end of the file
             // stop the thread and set the file laoded flag to true
             ofLogVerbose("stopping thread");
-			stopThread();
-			fileLoaded = true;
+            stopThread();
+            fileLoaded = true;
         }
     }
     
@@ -129,14 +129,14 @@ public:
         // split into array
         vector<string> words = ofSplitString(line, ",");
         
-         if(lock()){
+        if(lock()){
             // set info for feedback text
             numFrames = ofToInt(words[11]);
             info = "Name: "+ words[3]+"\n";
             info += "Capture Start Time: "+ words[5]+"\n";
             info += "Total Frames: "+ words[11];
-             
-             unlock();
+            
+            unlock();
         }
         
         ofLogVerbose("---> "+info);
@@ -165,12 +165,12 @@ public:
             
         }
         
-
+        
         // CLEAR the MAPS
         if(rigidbodies.size() > 0)  rigidbodies.clear();
         if(skeletons.size() > 0)    skeletons.clear();
         
-
+        
         // Loop through the collumns
         for(int i =0;i<typeMarkers.size();i++)
         {
@@ -181,8 +181,9 @@ public:
                 if (rigidbodies.find(names[i]) == rigidbodies.end()){
                     ofLogVerbose(ofToString(i)+" rigid body: "+names[i]+" CREATED");
                     MOCAP_Marker m;
-                    m.setMarker(0, names[i], i); // FIXME: move to constructor?
+                    m.setMarker(rigidBodyID, names[i], i); // FIXME: move to constructor?
                     rigidbodies.insert(std::pair<string,MOCAP_Marker>(names[i],m));
+                    rigidBodyID ++;
                 }
             }
             // Part of bone
@@ -196,8 +197,9 @@ public:
                 if(skeletons.find(skeletonName) == skeletons.end()){
                     ofLogVerbose(ofToString(i)+" SKELETOM: "+skeletonName+" CREATED");
                     MOCAP_Skeleton ms;
-                    ms.setSkeleton(0,skeletonName,i);
+                    ms.setSkeleton(skeletonID,skeletonName,i);
                     skeletons.insert(std::pair<string,MOCAP_Skeleton>(skeletonName,ms));
+                    skeletonID ++;
                 }
             }
             // else --> dont want to do anything with it
@@ -221,7 +223,7 @@ public:
         unique_lock<std::mutex> lock(mutex);
         return rigidbodies;
     }
-
+    
     // Get skeleton data
     std::map<string,MOCAP_Skeleton> getSkeletons(){
         unique_lock<std::mutex> lock(mutex);
@@ -233,7 +235,7 @@ public:
         unique_lock<std::mutex> lock(mutex);
         return numFrames;
     }
-
+    
     
     // Use unique_lock to protect a copy of count while getting a copy.
     int getCount()
@@ -264,7 +266,10 @@ protected:
     std::map<string,MOCAP_Skeleton> skeletons;
     // info feedback string
     string info = "";
-
+    
+    int rigidBodyID = 0;
+    int skeletonID = 0;
+    
     
 };
 
