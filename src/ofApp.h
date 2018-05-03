@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxImGui.h"
 #include "ofxOsc.h"
 #include "CSVloader.h" // include our ThreadedObject class.
 #include "MOCAP_Marker.h"
@@ -57,7 +58,7 @@ class ofApp : public ofBaseApp{
         bool dataLoaded;
         int frameNum;
         float fFrameNum;
-        int totalFrames;
+        int totalFrames = 1;
         int frameRate;
         float frameTime;
         float fTimeCounter;
@@ -84,5 +85,9 @@ class ofApp : public ofBaseApp{
         ofxTextInputField   newPort;
         ofxTextInputField   fps;
 
-		
+        //GUI
+        ofxImGui::Gui gui;
+        bool guiVisible;
+        bool mouseOverGui;
+        void doGui();
 };
