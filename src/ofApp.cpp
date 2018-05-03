@@ -34,8 +34,11 @@ void ofApp::setup(){
     
     // SETUP GUI
     gui.setup(nullptr, false);              // default theme, no autoDraw!
+    ImGuiIO& io = ImGui::GetIO();
+    io.IniFilename = NULL;                  // no imgui.ini
     guiVisible = true;
     //gui.setTheme(new ThemeTest());
+
     ImGuiStyle& style = ImGui::GetStyle();  //style tweaks
     //style.FrameBorderSize = 1.0f;
     //style.WindowBorderSize = 1.f;
@@ -237,11 +240,7 @@ void ofApp::draw(){
     ofSetColor(255);
     ofSetBackgroundColor(40);
     
-    // DRAW CLIENTS
-    for (int i = 0; i < clients.size(); i++)
-    {
-        clients[i]->draw();
-    }  
+
     
     if ( this->guiVisible ) { gui.draw(); }
     //gui.draw();
@@ -327,10 +326,6 @@ void ofApp::deleteClient(int &index)
 	int indexToRemove = index;
 	delete clients[indexToRemove];
 	clients.erase(clients.begin() + indexToRemove); 
-    for (int i = 0; i < clients.size(); i++)
-    {
-        clients[i]->rearangePosition(i,true);
-    }
 }
 
 //--------------------------------------------------------------
@@ -447,16 +442,6 @@ void ofApp::mouseDragged(int x, int y, int button){
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
     
-    deactivateInputs();
-    for (int i = 0; i < clients.size(); i++)
-    {
-        bool isInside = clients[i]->getArea().inside(x, y);
-        if (isInside)
-        {
-            clients[i]->isInside(x, y);
-            return;
-        }
-    }
 }
 
 //--------------------------------------------------------------
@@ -510,6 +495,32 @@ void ofApp::doGui() {
             mainmenu_height = ImGui::GetWindowSize().y;
             ImGui::EndMainMenuBar();
         }
+
+        // clients window
+        ImGui::SetNextWindowPos(ImVec2( 0, mainmenu_height ));
+        ImGui::SetNextWindowSize(ImVec2( ofGetWidth()-351, ofGetHeight()-mainmenu_height));
+        ImGui::Begin("clientspanel", NULL,  ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_HorizontalScrollbar);
+        // DRAW CLIENTS
+        int ypos = 0;
+        ImGui::SetNextWindowPos(ImVec2( 0, mainmenu_height ));
+        for (int i = 0; i < clients.size(); i++)
+        {
+            bool enabled = true;
+            ImGui::Begin(clients[i]->getName().data(), &enabled, ImGuiWindowFlags_NoResize |ImGuiWindowFlags_NoMove);
+            if ( enabled ) {
+                clients[i]->draw();
+                ypos = ImGui::GetWindowPos().y;
+                ypos += ImGui::GetWindowSize().y;
+                ImGui::SetNextWindowPos(ImVec2(0,ypos));
+            }
+            else
+            {
+                ofNotifyEvent(clients[i]->deleteClient,i);
+            }
+            ImGui::End();
+        }
+        ImGui::End();
+
 
         // right dock
         ImGui::SetNextWindowPos(ImVec2( ofGetWidth()-350, mainmenu_height ));
