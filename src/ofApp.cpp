@@ -499,7 +499,7 @@ void ofApp::doGui() {
         // clients window
         ImGui::SetNextWindowPos(ImVec2( 0, mainmenu_height ));
         ImGui::SetNextWindowSize(ImVec2( ofGetWidth()-351, ofGetHeight()-mainmenu_height));
-        ImGui::Begin("clientspanel", NULL,  ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_HorizontalScrollbar);
+        ImGui::Begin("clientspanel", NULL,  ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus);
         // DRAW CLIENTS
         int ypos = 0;
         ImGui::SetNextWindowPos(ImVec2( 0, mainmenu_height ));
@@ -520,7 +520,6 @@ void ofApp::doGui() {
             ImGui::End();
         }
         ImGui::End();
-
 
         // right dock
         ImGui::SetNextWindowPos(ImVec2( ofGetWidth()-350, mainmenu_height ));
