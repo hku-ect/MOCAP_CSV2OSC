@@ -34,15 +34,18 @@ init:
 install:
 - cd ..
 - git clone --depth=1 --branch=master https://github.com/openframeworks/openFrameworks
-- call openFrameworks\scripts\ci\msys2\addons\install.cmd
-- cd openFrameworks/addons
+- call openFrameworks\scripts\ci\addons\install.cmd
+- cd openFrameworks\addons
 - git clone --depth=1 --branch=develop https://github.com/jvcleave/ofxImGui.git
 - cd ..
 - mkdir apps\myapps
 - cd apps\myapps
+- dir
 - move "%APPVEYOR_BUILD_FOLDER%" .
 
 build_script:
-- cd ..\openFrameworks\apps\myapps\
+- dir
+- cd "%APPVEYOR_PROJECT_NAME%"
+- dir
 - if "%BUILDER%"=="MSYS2" make Debug 
 - if "%BUILDER%"=="VS" echo "BOE" 
