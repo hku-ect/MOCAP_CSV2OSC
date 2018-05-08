@@ -33,6 +33,22 @@ void ofApp::setup(){
     sender.setup(HOST, PORT);
     
     // SETUP GUI
+    gui.setup(nullptr, false);              // default theme, no autoDraw!
+    ImGuiIO& io = ImGui::GetIO();
+    io.IniFilename = NULL;                  // no imgui.ini
+    guiVisible = true;
+    //gui.setTheme(new ThemeTest());
+
+    ImGuiStyle& style = ImGui::GetStyle();  //style tweaks
+    //style.FrameBorderSize = 1.0f;
+    //style.WindowBorderSize = 1.f;
+    style.ChildBorderSize = 1.0f;
+    //style.ChildRounding = 8.f;
+    style.WindowPadding = ImVec2(5.0f, 5.0f);
+    style.ItemInnerSpacing = ImVec2(8.0f, 8.0f);
+    style.ItemSpacing = ImVec2(6.0f, 6.0f);
+
+    //old UI code
     InterfaceX = ofGetWidth() - 250;
     InterfaceY = 20;
     
@@ -124,6 +140,7 @@ void ofApp::update(){
         doFrame();
         fTimeCounter -= frameTime;
     }
+    doGui();
 }
 
 void ofApp::doFrame() {
@@ -223,52 +240,10 @@ void ofApp::draw(){
     ofSetColor(255);
     ofSetBackgroundColor(40);
     
-    // for visual feedback of file loading
-    csvloader.draw();
+
     
-    // GUI
-    loadFileBTN.draw();
-    addBTN.draw();
-    newName.draw();
-    newIP.draw();
-    newPort.draw();
-    fps.draw();
-    saveBTN.draw();
-    setFPSBTN.draw();
-    if(dataLoaded == true){
-        playpauseBTN.draw();
-        rewindBTN.draw();
-    }
-    
-    
-    // show frames
-    ofSetColor(255);
-    
-    font.drawString("New User", InterfaceX, InterfaceY+280);
-    
-    // DRAW CLIENTS
-    for (int i = 0; i < clients.size(); i++)
-    {
-        clients[i]->draw();
-    }
-    
-    
-    int w = ofMap(frameNum, 0, totalFrames, 0, 200);
-    int barY = 100;
-    
-    ofSetColor(255,100,100);
-    ofNoFill();
-    ofDrawRectangle(ofRectangle(InterfaceX, InterfaceY+barY, 202, 22));
-    ofFill();
-    ofSetColor(255);
-    ofDrawRectangle(ofRectangle(InterfaceX, InterfaceY+barY, w, 20));
-    ofDrawBitmapString("FrameNum: "+ofToString(frameNum), InterfaceX, InterfaceY+barY+40);
-    
-    ofDrawBitmapString("FrameRate: "+ofToString(ofGetFrameRate()), InterfaceX, InterfaceY+barY+110);
-    
-    
-   
-    
+    if ( this->guiVisible ) { gui.draw(); }
+    //gui.draw();
     // Playback teh recorded data
     /*
     if(dataLoaded == true && playData == true){
@@ -351,10 +326,6 @@ void ofApp::deleteClient(int &index)
 	int indexToRemove = index;
 	delete clients[indexToRemove];
 	clients.erase(clients.begin() + indexToRemove); 
-    for (int i = 0; i < clients.size(); i++)
-    {
-        clients[i]->rearangePosition(i,true);
-    }
 }
 
 //--------------------------------------------------------------
@@ -451,31 +422,7 @@ void ofApp::keyPressed(int key){
     {
         //playData = ! playData;
     }
-    
-    // GUI
-    if (newName.getState())
-    {
-        newName.addKey(key);
-        return;
-    }
-    if (newIP.getState())
-    {
-        newIP.addKey(key);
-        return;
-    }
-    if (newPort.getState())
-    {
-        newPort.addKey(key);
-        return;
-    }
-    if (fps.getState())
-    {
-        fps.addKey(key);
-        return;
-    }
-
-    
-   }
+}
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
@@ -495,49 +442,6 @@ void ofApp::mouseDragged(int x, int y, int button){
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
     
-    deactivateInputs();
-    for (int i = 0; i < clients.size(); i++)
-    {
-        bool isInside = clients[i]->getArea().inside(x, y);
-        if (isInside)
-        {
-            clients[i]->isInside(x, y);
-            return;
-        }
-    }
-    
-    if (loadFileBTN.isInside(x, y)) loadAFile();
-    if(newName.isInside(x, y)) return;
-    if(newIP.isInside(x, y)) return;
-    if(newPort.isInside(x, y)) return;
-    if(fps.isInside(x, y)) return;
-    if(addBTN.isInside(x, y))
-    {
-        addClient(clients.size(), newIP.getText(), ofToInt(newPort.getText()), newName.getText(), false, false, false, true, false);
-        return;
-    }
-    if(saveBTN.isInside(x, y)) saveData();
-    if(setFPSBTN.isInside(x,y)){
-        frameRate = ofToInt(fps.getText());
-        frameTime = 1.0f / frameRate;
-        //ofSetFrameRate(frameRate);
-    }
-    if(playpauseBTN.isInside(x,y)){
-        ofLogVerbose("hit play/pause button");
-        if(dataLoaded == true ){
-            playData = ! playData;
-            ofLogVerbose("whithin dataloaded true");
-        }
-    }
-    
-    if(rewindBTN.isInside(x,y)){
-        frameNum = 0;
-        fFrameNum = 0;
-    }
-
-    
-    
-
 }
 
 //--------------------------------------------------------------
@@ -568,4 +472,144 @@ void ofApp::gotMessage(ofMessage msg){
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
+}
+
+void ofApp::doGui() {
+    this->mouseOverGui = false;
+    if (this->guiVisible)
+    {
+        auto mainSettings = ofxImGui::Settings();
+        //ui stuff
+        gui.begin();
+        // Create a main menu bar
+        float mainmenu_height = 0;
+        if (ImGui::BeginMainMenuBar())
+        {
+            if (ImGui::BeginMenu("File"))
+            {
+                if (ImGui::MenuItem("Open CSV..", "Ctrl+O")) { loadAFile(); }
+                if (ImGui::MenuItem("Save Setup", "Ctrl+S"))   {saveData(); }
+                if (ImGui::MenuItem("Exit", "Ctrl+W"))  { ofExit(0); }
+                ImGui::EndMenu();
+            }
+            mainmenu_height = ImGui::GetWindowSize().y;
+            ImGui::EndMainMenuBar();
+        }
+
+        // clients window
+        ImGui::SetNextWindowPos(ImVec2( 0, mainmenu_height ));
+        ImGui::SetNextWindowSize(ImVec2( ofGetWidth()-351, ofGetHeight()-mainmenu_height));
+        ImGui::Begin("clientspanel", NULL,  ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_HorizontalScrollbar);
+        // DRAW CLIENTS
+        int ypos = 0;
+        ImGui::SetNextWindowPos(ImVec2( 0, mainmenu_height ));
+        for (int i = 0; i < clients.size(); i++)
+        {
+            bool enabled = true;
+            ImGui::Begin(clients[i]->getName().data(), &enabled, ImGuiWindowFlags_NoResize |ImGuiWindowFlags_NoMove);
+            if ( enabled ) {
+                clients[i]->draw();
+                ypos = ImGui::GetWindowPos().y;
+                ypos += ImGui::GetWindowSize().y;
+                ImGui::SetNextWindowPos(ImVec2(0,ypos));
+            }
+            else
+            {
+                ofNotifyEvent(clients[i]->deleteClient,i);
+            }
+            ImGui::End();
+        }
+        ImGui::End();
+
+
+        // right dock
+        ImGui::SetNextWindowPos(ImVec2( ofGetWidth()-350, mainmenu_height ));
+        ImGui::SetNextWindowSize(ImVec2( 350, ofGetHeight()-mainmenu_height));
+        ImGui::Begin("rightpanel", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_HorizontalScrollbar);
+        ImGui::Columns(2, "csvstats");
+        ImGui::Text("Name"); ImGui::NextColumn();
+        ImGui::Text(csvloader.take_name.data()); ImGui::NextColumn();
+        ImGui::Text("Capture Start Time"); ImGui::NextColumn();
+        ImGui::Text(csvloader.cap_time.data()); ImGui::NextColumn();
+        ImGui::Text("Total Frames"); ImGui::NextColumn();
+        ImGui::Text("%d", totalFrames); ImGui::NextColumn();
+        ImGui::Columns(1);
+        ImGui::Separator();
+
+        char fnumber[6];
+        sprintf(fnumber, "framenumber %d/%d", frameNum, totalFrames );
+        ImGui::ProgressBar(frameNum/float(totalFrames), ImVec2(-1,0), fnumber );
+
+        ImGui::Separator();
+
+        //playpause buttons
+        if ( ImGui::Button("Play") )
+        {
+            if ( dataLoaded == true )
+            {
+                playData = true;
+            }
+            else
+            {
+                ofLogNotice() << "No data loaded yet?";
+            }
+        }
+        ImGui::SameLine();
+        if ( ImGui::Button("Pause") )
+        {
+            if ( dataLoaded == true )
+            {
+                playData = false;
+            }
+            else
+            {
+                ofLogNotice() << "No data loaded yet?";
+            }
+        }
+        ImGui::SameLine();
+        if ( ImGui::Button("Rewind") )
+        {
+            if ( dataLoaded == true )
+            {
+                frameNum = 0;
+                fFrameNum = 0;
+            }
+            else
+            {
+                ofLogNotice() << "No data loaded yet?";
+            }
+        }
+
+
+        // Framerate setter
+        if ( ImGui::DragInt("drag framerate", &frameRate, 60, 0, 300, "%.0f%") ) {
+             //frameRate = ofToInt(fps.getText());
+             frameTime = 1.0f / frameRate;
+        }
+        //ImGui::SameLine();
+        //ShowHelpMarker("You can apply arithmetic operators +,*,/ on numerical values.\n  e.g. [ 100 ], input \'*2\', result becomes [ 200 ]\nUse +- to subtract.\n");
+
+        // client entry
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 8.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20.f, 20.f));
+        ImGui::Separator();
+        ImGui::BeginChild("ClientEntry", ImVec2(-1,140));
+        //ImGui::Columns(2);
+        static char client_name[128] = "Hello, world!";
+        ImGui::InputText("client name", client_name, IM_ARRAYSIZE(client_name));
+        static char client_ip[15] = "127.0.0.1";
+        ImGui::InputText("client ip", client_ip, IM_ARRAYSIZE(client_ip));
+        static int client_port = 123;
+        ImGui::InputInt("client port", &client_port);
+        if ( ImGui::Button("add client") )
+        {
+            addClient(clients.size(), ofToString(client_ip), client_port, ofToString(client_name), false, false, false, true, false );
+        }
+        ImGui::EndChild();
+        ImGui::PopStyleVar(2);
+        ImGui::End();
+
+        gui.end();
+        this->mouseOverGui = mainSettings.mouseOverGui;
+    }
 }
