@@ -6,8 +6,6 @@
 #include "CSVloader.h" // include our ThreadedObject class.
 #include "MOCAP_Marker.h"
 #include "MOCAP_Skeleton.h"
-#include "ofxTextButton.h"
-#include "ofxTextInputField.h"
 #include "ofxXmlSettings.h"
 #include "client.h"
 
