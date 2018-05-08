@@ -46,8 +46,6 @@ class ofApp : public ofBaseApp{
         void doFrame();
         void printOSCmessage(ofxOscMessage m);
     
-        void deactivateInputs();
-    
         CSVloader csvloader;
         /// \brief A local count that is only accessed in the main thread
         int mainAppsCount;
@@ -67,24 +65,6 @@ class ofApp : public ofBaseApp{
         std::map<string,MOCAP_Skeleton> skeletons;
         ofxOscSender sender;
     
-        // interface
-        int                 InterfaceX;
-        int                 InterfaceY;
-    
-        ofTrueTypeFont      font;
-        ofxTextButton       loadFileBTN;
-        ofxTextButton       addBTN;
-        ofxTextButton       saveBTN;
-        ofxTextButton       setFPSBTN;
-        ofxTextButton       playpauseBTN;
-        ofxTextButton       rewindBTN;
-
-    
-        ofxTextInputField   newName;
-        ofxTextInputField   newIP;
-        ofxTextInputField   newPort;
-        ofxTextInputField   fps;
-
         //GUI
         ofxImGui::Gui gui;
         bool guiVisible;

@@ -22,10 +22,7 @@ void ofApp::setup(){
     
     // set logging level determing which message will be showed
     ofSetLogLevel(OF_LOG_VERBOSE);
-    
-    // get a font
-    font.load("verdana.ttf", 12);
-    
+       
     // when startign we do not yet have any data
     dataLoaded = false;
     
@@ -48,28 +45,6 @@ void ofApp::setup(){
     style.ItemInnerSpacing = ImVec2(8.0f, 8.0f);
     style.ItemSpacing = ImVec2(6.0f, 6.0f);
 
-    //old UI code
-    InterfaceX = ofGetWidth() - 250;
-    InterfaceY = 20;
-    
-    loadFileBTN.setup(ofRectangle(InterfaceX, InterfaceY, 120, 20), "Load csv file", 12,ofColor(0,0,0), ofColor(255,255,255));
-    
-    
-    // Add Client GUI
-    int addClientY = 300;
-    int stepY = 40;
-    newName.setup(ofRectangle(InterfaceX, InterfaceY+addClientY, 140, 20), 10, "New Client","Client Name");
-    newIP.setup(ofRectangle(InterfaceX, InterfaceY+addClientY+(1*stepY), 140, 20), 10, "127.0.0.1","Client IP");
-    newPort.setup(ofRectangle(InterfaceX, InterfaceY+addClientY+(2*stepY), 140, 20), 10, "6200","Client Port");
-    addBTN.setup(ofRectangle(InterfaceX, InterfaceY+addClientY+(3*stepY), 140, 20), "Add Client", 12,ofColor(0,0,0), ofColor(255,255,255));
-    saveBTN.setup(ofRectangle(InterfaceX, InterfaceY+addClientY+(4*stepY), 120, 20), "Save Setup", 12, ofColor(0,0,0), ofColor(255,255,255));
-    
-    // other buttons
-    playpauseBTN.setup(ofRectangle(InterfaceX, InterfaceY+160, 120, 20), "play/pause", 12, ofColor(0,0,0), ofColor(255,255,255));
-    rewindBTN.setup(ofRectangle(InterfaceX+130, InterfaceY+160, 60, 20), "rewind", 12, ofColor(0,0,0), ofColor(255,255,255));
-    setFPSBTN.setup(ofRectangle(InterfaceX+100, InterfaceY+220, 70, 20), "set FPS", 12, ofColor(0,0,0), ofColor(255,255,255));
-    fps.setup(ofRectangle(InterfaceX, InterfaceY+220, 60, 20), 10, "30","FPS");
-    
     // get data
     setupData();
     
@@ -82,15 +57,13 @@ void ofApp::setupData()
 {
     ofxXmlSettings data("setup.xml");
     data.pushTag("setup",0);
-    int fRate = data.getValue("fps", 30);
+    frameRate = data.getValue("fps", 30);
     //string interface = data.getValue("interface", "en0");
     //string natnetip = data.getValue("ip", "10.200.200.13");
     //interfaceName.setText(interface);
     //interfaceIP.setText(natnetip);
-    fps.setText(ofToString(fRate));
-    
-    frameRate = fRate;
-    frameTime = 1.0 / fRate;
+
+    frameTime = 1.0 / frameRate;
     //ofSetFrameRate(fRate);
     data.popTag();
     
@@ -239,9 +212,7 @@ void ofApp::draw(){
     //ofDrawBitmapString("Press 'l' to load file", 20, 15);
     ofSetColor(255);
     ofSetBackgroundColor(40);
-    
 
-    
     if ( this->guiVisible ) { gui.draw(); }
     //gui.draw();
     // Playback teh recorded data
@@ -290,7 +261,7 @@ void ofApp::saveData()
     ofxXmlSettings save;
     save.addTag("setup");
     save.pushTag("setup",0);
-    save.addValue("fps", ofToInt(fps.getText()));
+    save.addValue("fps", frameRate);
     //save.addValue("interface", interfaceName.getText());
     //save.addValue("ip", interfaceIP.getText());
     save.popTag();
@@ -327,19 +298,6 @@ void ofApp::deleteClient(int &index)
 	delete clients[indexToRemove];
 	clients.erase(clients.begin() + indexToRemove); 
 }
-
-//--------------------------------------------------------------
-void ofApp::deactivateInputs()
-{
-    //deactivate all inputfields
-    //interfaceName.deactivate();
-    //interfaceIP.deactivate();
-    fps.deactivate();
-    newName.deactivate();
-    newIP.deactivate();
-    newPort.deactivate();
-}
-
 
 //--------------------------------------------------------------
 void ofApp::loadAFile(){
