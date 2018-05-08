@@ -51,5 +51,5 @@ install:
 
 build_script:
 - dir
-- if "%BUILDER%"=="MSYS2" make Debug 
+- if "%BUILDER%"=="MSYS2" '%MSYS2_PATH%\usr\bin\bash -lc "make Debug"' 
 - if "%BUILDER%"=="VS" echo "BOE" 
