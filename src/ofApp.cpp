@@ -539,7 +539,7 @@ void ofApp::doGui() {
 
 
         // Framerate setter
-        if ( ImGui::DragInt("drag framerate", &frameRate, 60, 0, 300, "%.0f%") ) {
+        if ( ImGui::DragInt("drag framerate", &frameRate, 1, 0, 300, "%.0f%") ) {
              //frameRate = ofToInt(fps.getText());
              frameTime = 1.0f / frameRate;
         }
