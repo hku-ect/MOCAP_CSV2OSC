@@ -44,13 +44,10 @@ install:
 - git clone --depth=1 --branch=develop https://github.com/jvcleave/ofxImGui.git
 - cd ..
 - mkdir apps\myapps
-- cd apps\myapps
+- cd apps\myapps\%APPVEYOR_PROJECT_NAME%
 - dir
-- move "%APPVEYOR_BUILD_FOLDER%" .
 
 build_script:
-- dir
-- cd "%APPVEYOR_PROJECT_NAME%"
 - dir
 - if "%BUILDER%"=="MSYS2" make Debug 
 - if "%BUILDER%"=="VS" echo "BOE" 
