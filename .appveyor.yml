@@ -34,22 +34,16 @@ init:
 install:
 - cd ..
 - git clone --depth=1 --branch=master https://github.com/openframeworks/openFrameworks
-- dir
 - mkdir openFrameworks\apps\myapps
 - move %APPVEYOR_PROJECT_SLUG% openFrameworks\apps\myapps\%APPVEYOR_PROJECT_NAME%
 - cd openFrameworks
 - if "%BUILDER%"=="MSYS2" %MSYS2_PATH%\usr\bin\bash -lc "scripts/msys2/install_dependencies.sh --noconfirm"
 - if "%BUILDER%"=="MSYS2" %MSYS2_PATH%\usr\bin\bash -lc "scripts/msys2/download_libs.sh --silent"
-- dir
 - cd addons
 - git clone --depth=1 --branch=develop https://github.com/jvcleave/ofxImGui.git
-- cd ..
-- cd apps\myapps\
-- dir
-- cd %APPVEYOR_PROJECT_NAME%
-- dir
+- cd ..\apps\myapps\%APPVEYOR_PROJECT_NAME%
 
 build_script:
-- dir
 - if "%BUILDER%"=="MSYS2" %MSYS2_PATH%\usr\bin\bash -lc "make Debug" 
 - if "%BUILDER%"=="VS" echo "BOE" 
+- dir ./bin
