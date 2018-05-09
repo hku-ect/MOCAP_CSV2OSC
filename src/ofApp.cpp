@@ -552,11 +552,11 @@ void ofApp::doGui() {
         ImGui::Separator();
         ImGui::BeginChild("ClientEntry", ImVec2(-1,140));
         //ImGui::Columns(2);
-        static char client_name[128] = "Hello, world!";
+        static char client_name[128] = "localhost";
         ImGui::InputText("client name", client_name, IM_ARRAYSIZE(client_name));
         static char client_ip[15] = "127.0.0.1";
         ImGui::InputText("client ip", client_ip, IM_ARRAYSIZE(client_ip));
-        static int client_port = 123;
+        static int client_port = 1234;
         ImGui::InputInt("client port", &client_port);
         if ( ImGui::Button("add client") )
         {
