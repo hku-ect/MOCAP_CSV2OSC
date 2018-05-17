@@ -62,5 +62,5 @@ deploy:
   artifact: buildzip 
 
 artifacts:
-- path: \*.zip
+- path: \openframeworks\apps\myapps\%APPVEYOR_PROJECT_NAME%\*.zip
   name: buildzip
