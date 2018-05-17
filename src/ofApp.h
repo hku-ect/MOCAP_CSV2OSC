@@ -70,6 +70,11 @@ class ofApp : public ofBaseApp{
         int                 InterfaceX;
         int                 InterfaceY;
     
+        ofRectangle         UserFeedbackCanvas;
+        ofBitmapFont        UserFeedbackFont;
+        string              UserFeedback;
+
+    
         ofTrueTypeFont      font;
         ofxTextButton       loadFileBTN;
         ofxTextButton       addBTN;
