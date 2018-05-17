@@ -46,3 +46,21 @@ install:
 build_script:
 - if "%BUILDER%"=="MSYS2" %MSYS2_PATH%\usr\bin\bash -lc "make Debug" 
 - if "%BUILDER%"=="VS" echo "BOE" 
+
+after_build:
+- 7z a %APPVEYOR_PROJECT_NAME%_win_%APPVEYOR_BRANCH%_%APPVEYOR_COMMIT%.zip bin\*.*
+- dir
+
+deploy:
+  provider: FTP
+  protocol: sftp
+  host: pong.hku.nl
+  username: buildbot
+  password:
+    secure: AABBBCCCCddd123==
+  folder: public_html/nightly/
+  artifact: /.*\.zip/          
+
+artifacts:
+- path: \*.zip
+
