@@ -48,7 +48,8 @@ build_script:
 - if "%BUILDER%"=="VS" echo "BOE" 
 
 after_build:
-- 7z a %APPVEYOR_PROJECT_NAME%_win_%APPVEYOR_REPO_BRANCH%_%APPVEYOR_REPO_COMMIT%.zip bin\*.*
+- cd bin
+- 7z a %APPVEYOR_BUILD_FOLDER%\%APPVEYOR_PROJECT_NAME%_win_%APPVEYOR_REPO_BRANCH%_%APPVEYOR_REPO_COMMIT%.zip *.*
 - dir
 
 deploy:
@@ -62,5 +63,5 @@ deploy:
   artifact: buildzip 
 
 artifacts:
-- path: \openframeworks\apps\myapps\%APPVEYOR_PROJECT_NAME%\*.zip
+- path: *.zip
   name: buildzip
