@@ -63,5 +63,5 @@ deploy:
   artifact: buildzip 
 
 artifacts:
-- path: *.zip
-  name: buildzip
+  - path: '*.zip'
+    name: buildzip
