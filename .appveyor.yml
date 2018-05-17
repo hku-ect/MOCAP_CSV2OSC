@@ -47,8 +47,8 @@ build_script:
 - if "%BUILDER%"=="MSYS2" %MSYS2_PATH%\usr\bin\bash -lc "make Debug" 
 - if "%BUILDER%"=="VS" echo "BOE" 
 
-after_build:
-- 7z a %APPVEYOR_PROJECT_NAME%_win_%APPVEYOR_BRANCH%_%APPVEYOR_COMMIT%.zip bin\*.*
+on_success:
+- 7z a %APPVEYOR_PROJECT_NAME%_win_%APPVEYOR_REPO_BRANCH%_%APPVEYOR_REPO_COMMIT%.zip bin\*.*
 - dir
 
 deploy:
@@ -59,8 +59,8 @@ deploy:
   password:
     secure: AABBBCCCCddd123==
   folder: public_html/nightly/
-  artifact: /.*\.zip/          
+  artifact: buildzip 
 
 artifacts:
 - path: \*.zip
-
+  name: buildzip
