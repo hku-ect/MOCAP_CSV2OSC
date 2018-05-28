@@ -58,7 +58,7 @@ deploy:
   host: pong.hku.nl
   username: buildbot
   password:
-    secure: AABBBCCCCddd123==
+    secure: sX82pi7zNN1f0L6eYSqOQA==
   folder: public_html/nightly/
   artifact: buildzip 
 
