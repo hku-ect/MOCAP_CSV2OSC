@@ -563,6 +563,9 @@ void ofApp::mousePressed(int x, int y, int button){
     if (UserFeedbackCanvas.inside(x,y)){
         UserFeedback = "";
         
+    }else if(UserFeedback !=""){
+        UserFeedback = "";
+        
     }
 
     
