@@ -459,23 +459,17 @@ void ofApp::doGui() {
         ImGui::SetNextWindowSize(ImVec2( ofGetWidth()-351, ofGetHeight()-mainmenu_height));
         ImGui::Begin("clientspanel", NULL,  ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus);
         // DRAW CLIENTS
-        int ypos = 0;
-        ImGui::SetNextWindowPos(ImVec2( 0, mainmenu_height ));
         for (int i = 0; i < clients.size(); i++)
         {
             bool enabled = true;
-            ImGui::Begin(clients[i]->getName().data(), &enabled, ImGuiWindowFlags_NoResize |ImGuiWindowFlags_NoMove);
+            ImGui::CollapsingHeader(clients[i]->getName().data(), &enabled, ImGuiTreeNodeFlags_DefaultOpen);
             if ( enabled ) {
                 clients[i]->draw();
-                ypos = ImGui::GetWindowPos().y;
-                ypos += ImGui::GetWindowSize().y;
-                ImGui::SetNextWindowPos(ImVec2(0,ypos));
             }
             else
             {
                 ofNotifyEvent(clients[i]->deleteClient,i);
             }
-            ImGui::End();
         }
         ImGui::End();
 
