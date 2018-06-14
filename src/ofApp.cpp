@@ -462,11 +462,11 @@ void ofApp::doGui() {
         for (int i = 0; i < clients.size(); i++)
         {
             bool enabled = true;
-            ImGui::CollapsingHeader(clients[i]->getName().data(), &enabled, ImGuiTreeNodeFlags_DefaultOpen);
-            if ( enabled ) {
+            if ( ImGui::CollapsingHeader(clients[i]->getName().data(), &enabled, ImGuiTreeNodeFlags_DefaultOpen) )
+            {
                 clients[i]->draw();
             }
-            else
+            if ( ! enabled )
             {
                 ofNotifyEvent(clients[i]->deleteClient,i);
             }
