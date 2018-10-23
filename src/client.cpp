@@ -7,6 +7,7 @@
 //
 
 #include "client.h"
+#include "fontawesome5.h"
 
 client::client(int ind,string i,int p,string n,bool r,bool m,bool s, bool hier)
 {
@@ -50,6 +51,8 @@ void client::draw()
     ImGui::Text("port:");
     ImGui::SameLine();
     ImGui::TextColored(ImVec4(0.5f,0.3f,1.0f,1.0f), "%d", port);
+    ImGui::Text(ICON_FA_BROADCAST_TOWER);
+    ImGui::SameLine();
     ImGui::Checkbox("Rigid", &isRigid);
     ImGui::SameLine();
     ImGui::Checkbox("Mark", &isMarker);
