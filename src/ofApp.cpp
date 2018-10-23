@@ -1,5 +1,5 @@
 #include "ofApp.h"
-
+#include "fontawesome5.h"
 
 /*
  Name: CSVtoOSC
@@ -16,6 +16,7 @@ const float MOTIVE_MOCAP_FPS = 120.0f;
 
 // boolean to check if we play the data or not
 bool playData = false;
+static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -30,8 +31,17 @@ void ofApp::setup(){
     sender.setup(HOST, PORT);
     
     // SETUP GUI
-    gui.setup(nullptr, false);              // default theme, no autoDraw!
+    ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
+    io.Fonts->AddFontDefault();
+    ImFontConfig config;
+    config.MergeMode = true;
+    //config.GlyphMinAdvanceX = 13.0f; // Use if you want to make the icon monospaced
+    config.PixelSnapH = true;
+    //io.Fonts->AddFontFromFileTTF("fonts/fontawesome-webfont.ttf", 13.0f, &config, icon_ranges);
+    io.Fonts->AddFontFromFileTTF(FONT_ICON_FILE_NAME_FAS, 12.0f, &config, icon_ranges);
+
+    gui.setup(nullptr, false);              // default theme, no autoDraw!
     io.IniFilename = NULL;                  // no imgui.ini
     guiVisible = true;
     //gui.setTheme(new ThemeTest());
@@ -462,7 +472,9 @@ void ofApp::doGui() {
         for (int i = 0; i < clients.size(); i++)
         {
             bool enabled = true;
-            if ( ImGui::CollapsingHeader(clients[i]->getName().data(), &enabled, ImGuiTreeNodeFlags_DefaultOpen) )
+            char buf[256];
+            snprintf(buf, sizeof(buf),"%s %s", ICON_FA_DESKTOP, clients[i]->getName().data());
+            if ( ImGui::CollapsingHeader(buf, &enabled, ImGuiTreeNodeFlags_DefaultOpen) )
             {
                 clients[i]->draw();
             }
@@ -494,31 +506,7 @@ void ofApp::doGui() {
         ImGui::Separator();
 
         //playpause buttons
-        if ( ImGui::Button("Play") )
-        {
-            if ( dataLoaded == true )
-            {
-                playData = true;
-            }
-            else
-            {
-                ofLogNotice() << "No data loaded yet?";
-            }
-        }
-        ImGui::SameLine();
-        if ( ImGui::Button("Pause") )
-        {
-            if ( dataLoaded == true )
-            {
-                playData = false;
-            }
-            else
-            {
-                ofLogNotice() << "No data loaded yet?";
-            }
-        }
-        ImGui::SameLine();
-        if ( ImGui::Button("Rewind") )
+        if ( ImGui::Button(ICON_FA_BACKWARD) )
         {
             if ( dataLoaded == true )
             {
@@ -530,10 +518,35 @@ void ofApp::doGui() {
                 ofLogNotice() << "No data loaded yet?";
             }
         }
+        ImGui::SameLine();
+        if ( ImGui::Button(ICON_FA_PLAY) )
+        {
+            if ( dataLoaded == true )
+            {
+                playData = true;
+            }
+            else
+            {
+                ofLogNotice() << "No data loaded yet?";
+            }
+        }
+        ImGui::SameLine();
+        if ( ImGui::Button(ICON_FA_PAUSE) )
+        {
+            if ( dataLoaded == true )
+            {
+                playData = false;
+            }
+            else
+            {
+                ofLogNotice() << "No data loaded yet?";
+            }
+        }
+
 
 
         // Framerate setter
-        if ( ImGui::DragInt("drag framerate", &frameRate, 1, 0, 300, "%.0f%") ) {
+        if ( ImGui::DragInt("framerate", &frameRate, 1, 0, 300, "%.0f%") ) {
              //frameRate = ofToInt(fps.getText());
              frameTime = 1.0f / frameRate;
         }
@@ -544,7 +557,7 @@ void ofApp::doGui() {
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 8.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20.f, 20.f));
         ImGui::Separator();
-        ImGui::BeginChild("ClientEntry", ImVec2(-1,140));
+        ImGui::BeginChild(" ClientEntry", ImVec2(-1,140));
         //ImGui::Columns(2);
         static char client_name[128] = "localhost";
         ImGui::InputText("client name", client_name, IM_ARRAYSIZE(client_name));
@@ -552,7 +565,7 @@ void ofApp::doGui() {
         ImGui::InputText("client ip", client_ip, IM_ARRAYSIZE(client_ip));
         static int client_port = 1234;
         ImGui::InputInt("client port", &client_port);
-        if ( ImGui::Button("add client") )
+        if ( ImGui::Button(ICON_FA_DESKTOP " add client") )
         {
             addClient(clients.size(), ofToString(client_ip), client_port, ofToString(client_name), false, false, false, true, false );
         }
