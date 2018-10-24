@@ -237,10 +237,11 @@ script:
     fi
 
 git:
-  depth: 10
+  depth: 100
 
 after_success:
   - git checkout config.make
+  - git fetch --all --tags
   - cd bin; pwd
   - if [[ $TRAVIS_PULL_REQUEST == "false" ]]; then
       if [ -n "$TRAVIS_TAG" ] || [[ $TRAVIS_BRANCH == "master" ]]; then

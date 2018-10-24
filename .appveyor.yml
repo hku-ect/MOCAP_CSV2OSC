@@ -20,8 +20,7 @@ environment:
   #    BITS: 64
 
 configuration: Debug
-shallow_clone: true
-clone_depth: 10
+clone_depth: 100
 
 init:
 - set MSYS2_PATH=c:\msys64
@@ -49,6 +48,7 @@ build_script:
 
 after_build:
 # windows batch sucks :S this gets git describe info into a var
+- git fetch --all --tags
 - git describe --tag --always --dirty --abbrev=4 > gitversion.txt
 - set /p GITVERSION=<gitversion.txt
 - del gitversion.txt
