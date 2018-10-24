@@ -88,7 +88,7 @@
 #
 #   Note: Leave a leading space when adding list items with the += operator
 ################################################################################
-# PROJECT_DEFINES = 
+PROJECT_DEFINES = VERSION=\"$(GIT_VERSION)\"
 
 ################################################################################
 # PROJECT CFLAGS
@@ -140,3 +140,4 @@
 ################################################################################
 # PROJECT_CXX = 
 # PROJECT_CC = 
+GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always --tags)

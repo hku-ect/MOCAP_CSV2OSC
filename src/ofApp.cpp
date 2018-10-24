@@ -1,5 +1,6 @@
 #include "ofApp.h"
 #include "fontawesome5.h"
+#include "version.h"
 
 /*
  Name: CSVtoOSC
@@ -23,7 +24,6 @@ void ofApp::setup(){
     
     // set logging level determing which message will be showed
     ofSetLogLevel(OF_LOG_VERBOSE);
-       
     // when startign we do not yet have any data
     dataLoaded = false;
     
@@ -442,6 +442,8 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 
 }
 
+static bool version_popup = false;
+
 void ofApp::doGui() {
     this->mouseOverGui = false;
     if (this->guiVisible)
@@ -457,6 +459,7 @@ void ofApp::doGui() {
             {
                 if (ImGui::MenuItem("Open CSV..", "Ctrl+O")) { loadAFile(); }
                 if (ImGui::MenuItem("Save Setup", "Ctrl+S"))   {saveData(); }
+                if (ImGui::MenuItem("About", "Ctrl+i")) { version_popup=true; }
                 if (ImGui::MenuItem("Exit", "Ctrl+W"))  { ofExit(0); }
                 ImGui::EndMenu();
             }
@@ -571,6 +574,20 @@ void ofApp::doGui() {
         }
         ImGui::EndChild();
         ImGui::PopStyleVar(2);
+        if (version_popup) {
+            ImGui::OpenPopup("Version Info");
+        }
+        if (ImGui::BeginPopupModal("Version Info"))
+        {
+            ImGui::Text( "Version: " VERSION );
+            //TODO: more info through python
+            if ( ImGui::Button("Close") ) {
+                version_popup = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
         ImGui::End();
 
         gui.end();
