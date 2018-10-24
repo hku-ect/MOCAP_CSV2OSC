@@ -30,10 +30,6 @@ init:
 - if "%BUILDER%_%PLATFORM%"=="MSYS2_x64" set MSYSTEM=MINGW64
 - '%MSYS2_PATH%\usr\bin\bash -lc "pacman --noconfirm -S --needed unzip rsync mingw-w64-i686-ntldd-git"'
 - if "%BUILDER%"=="VS" set PATH=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin;%PATH%
-# windows batch sucks :S this gets git describe info into a var
-- git describe --tag --always --dirty --abbrev=4 > gitversion.txt
-- set /p GITVERSION=<gitversion.txt
-- del gitversion.txt
 
 install:
 - cd ..
@@ -52,6 +48,10 @@ build_script:
 - if "%BUILDER%"=="VS" echo "BOE" 
 
 after_build:
+# windows batch sucks :S this gets git describe info into a var
+- git describe --tag --always --dirty --abbrev=4 > gitversion.txt
+- set /p GITVERSION=<gitversion.txt
+- del gitversion.txt
 - cd bin
 - 7z a %APPVEYOR_BUILD_FOLDER%\%APPVEYOR_PROJECT_NAME%_win_%APPVEYOR_REPO_BRANCH%_%GITVERSION%.zip *.*
 - dir
