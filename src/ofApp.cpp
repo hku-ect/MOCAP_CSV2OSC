@@ -287,9 +287,7 @@ void ofApp::saveData()
 void ofApp::addClient(int i,string ip,int p,string n,bool r,bool m,bool s, bool live, bool hierarchy)
 {
     // Check if we do not add a cleint with the same properties twice
-    ofAddListener(c->deleteClient, this, &ofApp::deleteClient);
     bool uniqueClient = true;
-    clients.push_back(c);
     for (int i = 0; i < clients.size(); i++)
     {
         if(clients[i]->getIP() == ip && clients[i]->getPort() == p){
@@ -302,7 +300,6 @@ void ofApp::addClient(int i,string ip,int p,string n,bool r,bool m,bool s, bool 
         client *c = new client(i,ip,p,n,r,m,s,hierarchy);
         ofAddListener(c->deleteClient, this, &ofApp::deleteClient);
         clients.push_back(c);
-        if(UserFeedback != "") UserFeedback = "";
     }else{
         // TODO: create a logging console where we echo this message
         // See console example in the imgui demo
