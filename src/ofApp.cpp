@@ -34,6 +34,7 @@ void ofApp::setup(){
     // SETUP GUI
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
+    io.IniFilename = NULL;                  // no imgui.ini
     io.Fonts->AddFontDefault();
     ImFontConfig config;
     config.MergeMode = true;
