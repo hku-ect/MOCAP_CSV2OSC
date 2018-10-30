@@ -223,18 +223,17 @@ install:
 script:
 #  - scripts/ci/addons/build.sh
   - cd $TRAVIS_BUILD_DIR
-  - echo "OF_ROOT=$HOME/openFrameworks" >> config.make
-#  - sed -i '' "s;..\/..\/..;$HOME\/openFrameworks;g" Project.xcconfig
-#  - sed -i '' "s;..\/..\/..;$HOME\/openFrameworks;g" MOCAP_CSV2OSC.xcodeproj/project.pbxproj
+  - cd ..
+  - mv MOCAP_CSV2OSC ~/openFrameworks/apps/devApps/
+  - cd ~/openFrameworks/apps/devApps/MOCAP_CSV2OSC
   - if [ "$TARGET" == "linux64" ]; then
        make Debug;
     elif [ "$TARGET" == "osx" ]; then
-       cd ..;
-       mv MOCAP_CSV2OSC ~/openFrameworks/apps/devApps/;
-       cd ~/openFrameworks/apps/devApps/MOCAP_CSV2OSC;
        xcodebuild -configuration Release -target MOCAP_CSV2OSC -project "MOCAP_CSV2OSC.xcodeproj";
-       cd ..; mv MOCAP_CSV2OSC $TRAVIS_BUILD_DIR; cd $TRAVIS_BUILD_DIR;
     fi
+  - cd ..
+  - mv MOCAP_CSV2OSC $TRAVIS_BUILD_DIR
+  - cd $TRAVIS_BUILD_DIR;
 
 git:
   depth: 100
@@ -242,7 +241,7 @@ git:
 after_success:
   - git checkout config.make
   - git fetch --all --tags
-  - cd bin; pwd
+  - cd bin
   - if [[ $TRAVIS_PULL_REQUEST == "false" ]]; then
       if [ -n "$TRAVIS_TAG" ] || [[ $TRAVIS_BRANCH == "master" ]]; then
         zip -r $( echo $TRAVIS_REPO_SLUG | cut -d"/" -f2)_${TRAVIS_OS_NAME}_$( git describe --tag --always --dirty --abbrev=4).zip *;

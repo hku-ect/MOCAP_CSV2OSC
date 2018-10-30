@@ -1,6 +1,7 @@
 #include "ofApp.h"
 #include "fontawesome5.h"
 #include "version.h"
+#include "themes.h"
 
 /*
  Name: CSVtoOSC
@@ -41,19 +42,9 @@ void ofApp::setup(){
     //io.Fonts->AddFontFromFileTTF("fonts/fontawesome-webfont.ttf", 13.0f, &config, icon_ranges);
     io.Fonts->AddFontFromFileTTF(FONT_ICON_FILE_NAME_FAS, 12.0f, &config, icon_ranges);
 
-    gui.setup(nullptr, false);              // default theme, no autoDraw!
+    gui.setup(new GuiGreenTheme(), false);              // default theme, no autoDraw!
     io.IniFilename = NULL;                  // no imgui.ini
     guiVisible = true;
-    //gui.setTheme(new ThemeTest());
-
-    ImGuiStyle& style = ImGui::GetStyle();  //style tweaks
-    //style.FrameBorderSize = 1.0f;
-    //style.WindowBorderSize = 1.f;
-    style.ChildBorderSize = 1.0f;
-    //style.ChildRounding = 8.f;
-    style.WindowPadding = ImVec2(5.0f, 5.0f);
-    style.ItemInnerSpacing = ImVec2(8.0f, 8.0f);
-    style.ItemSpacing = ImVec2(6.0f, 6.0f);
 
     // get data
     setupData();
@@ -295,9 +286,25 @@ void ofApp::saveData()
 //--------------------------------------------------------------
 void ofApp::addClient(int i,string ip,int p,string n,bool r,bool m,bool s, bool live, bool hierarchy)
 {
-    client *c = new client(i,ip,p,n,r,m,s,hierarchy);
-    ofAddListener(c->deleteClient, this, &ofApp::deleteClient);
-    clients.push_back(c);
+    // Check if we do not add a cleint with the same properties twice
+    bool uniqueClient = true;
+    for (int i = 0; i < clients.size(); i++)
+    {
+        if(clients[i]->getIP() == ip && clients[i]->getPort() == p){
+            uniqueClient = false;
+            break;
+        }
+    }
+
+    if(uniqueClient){
+        client *c = new client(i,ip,p,n,r,m,s,hierarchy);
+        ofAddListener(c->deleteClient, this, &ofApp::deleteClient);
+        clients.push_back(c);
+    }else{
+        // TODO: create a logging console where we echo this message
+        // See console example in the imgui demo
+        ofLogWarning() << "A client with the same settings already exists. \n Please change IP address and or port!";
+    }
 }
 
 //--------------------------------------------------------------
@@ -553,15 +560,9 @@ void ofApp::doGui() {
              //frameRate = ofToInt(fps.getText());
              frameTime = 1.0f / frameRate;
         }
-        //ImGui::SameLine();
-        //ShowHelpMarker("You can apply arithmetic operators +,*,/ on numerical values.\n  e.g. [ 100 ], input \'*2\', result becomes [ 200 ]\nUse +- to subtract.\n");
 
         // client entry
-        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 8.0f);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20.f, 20.f));
         ImGui::Separator();
-        ImGui::BeginChild(" ClientEntry", ImVec2(-1,140));
-        //ImGui::Columns(2);
         static char client_name[128] = "localhost";
         ImGui::InputText("client name", client_name, IM_ARRAYSIZE(client_name));
         static char client_ip[15] = "127.0.0.1";
@@ -572,8 +573,6 @@ void ofApp::doGui() {
         {
             addClient(clients.size(), ofToString(client_ip), client_port, ofToString(client_name), false, false, false, true, false );
         }
-        ImGui::EndChild();
-        ImGui::PopStyleVar(2);
         if (version_popup) {
             ImGui::OpenPopup("Version Info");
         }
