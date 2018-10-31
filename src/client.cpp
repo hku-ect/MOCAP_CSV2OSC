@@ -44,6 +44,8 @@ void client::sendBundle(ofxOscBundle &b)
 
 void client::draw()
 {
+    ImGui::Text(ICON_FA_BROADCAST_TOWER);
+    ImGui::SameLine();
     ImGui::Text("ip:");
     ImGui::SameLine();
     ImGui::TextColored(ImVec4(0.7f,1.0f,1.0f,1.0f), ip.data());
@@ -51,8 +53,6 @@ void client::draw()
     ImGui::Text("port:");
     ImGui::SameLine();
     ImGui::TextColored(ImVec4(0.5f,0.3f,1.0f,1.0f), "%d", port);
-    ImGui::Text(ICON_FA_BROADCAST_TOWER);
-    ImGui::SameLine();
     ImGui::Checkbox("Rigid", &isRigid);
     ImGui::SameLine();
     ImGui::Checkbox("Mark", &isMarker);

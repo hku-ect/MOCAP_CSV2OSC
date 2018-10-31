@@ -213,7 +213,7 @@ install:
     fi
 #  - scripts/linux/compileOF.sh
   - cd addons
-  - git clone --depth=1 --branch=develop https://github.com/jvcleave/ofxImGui.git
+  - git clone --depth=1 https://github.com/jvcleave/ofxImGui.git
   - cd ..
   - if [ "$TARGET" == "linux64" ]; then
       cd libs/openFrameworksCompiled/project;
