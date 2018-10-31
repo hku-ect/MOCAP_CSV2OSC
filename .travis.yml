@@ -158,7 +158,7 @@ matrix:
 #    env: TARGET="android" OPT="armv7" OF_BRANCH="master"
 #    cache:
 #      directories:
-#        - ~/android-ndk-r12b
+#        - ~/android-ndk-r12bfatal: No tags can describe 
 
 
 # Android armv7, OF stable: Not supported yet

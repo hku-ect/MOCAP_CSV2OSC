@@ -13,7 +13,7 @@
 			<dict>
 				<key>fileRef</key>
 				<string>FC5DA1C87211D4F6377DA719</string>
-				<key>isa</key>
+				<key>isa</key>fatal: No tags can describe 
 				<string>PBXBuildFile</string>
 			</dict>
 			<key>FC5DA1C87211D4F6377DA719</key>
@@ -1460,6 +1460,7 @@
 				<key>isa</key>
 				<string>PBXFileReference</string>
 				<key>name</key>
+
 				<string>BaseEngine.cpp</string>
 				<key>path</key>
 				<string>../../../addons/ofxImGui/src/BaseEngine.cpp</string>
@@ -2203,7 +2204,7 @@ fi
 					<string>5C2607C471F8D48C0036C56E</string>
 					<string>E984796BE84AA4315636B6E7</string>
 					<string>00413C35AAE31B483D7538AB</string>
-					<string>0090B479605B26E7C387B02D</string>
+          <string>0090B479605B26E7C387B02D</string>
 					<string>72A929D3561B8232A182ABFC</string>
 					<string>5864AD82E20F15536D054EA3</string>
 					<string>4ADB88E2FB52E76A471065DE</string>

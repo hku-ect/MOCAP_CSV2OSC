@@ -295,7 +295,6 @@ void ofApp::addClient(int i,string ip,int p,string n,bool r,bool m,bool s, bool 
             break;
         }
     }
-
     if(uniqueClient){
         client *c = new client(i,ip,p,n,r,m,s,hierarchy);
         ofAddListener(c->deleteClient, this, &ofApp::deleteClient);
@@ -416,7 +415,7 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-    
+
 }
 
 //--------------------------------------------------------------
