@@ -39,9 +39,8 @@ void ofApp::setup(){
     config.MergeMode = true;
     //config.GlyphMinAdvanceX = 13.0f; // Use if you want to make the icon monospaced
     config.PixelSnapH = true;
-    //io.Fonts->AddFontFromFileTTF("fonts/fontawesome-webfont.ttf", 13.0f, &config, icon_ranges);
-    io.Fonts->AddFontFromFileTTF(FONT_ICON_FILE_NAME_FAS, 12.0f, &config, icon_ranges);
-
+    
+    io.Fonts->AddFontFromFileTTF(ofToDataPath( FONT_ICON_FILE_NAME_FAS ).data(), 12.0f, &config, icon_ranges);
     gui.setup(new GuiGreenTheme(), false);              // default theme, no autoDraw!
     io.IniFilename = NULL;                  // no imgui.ini
     guiVisible = true;
