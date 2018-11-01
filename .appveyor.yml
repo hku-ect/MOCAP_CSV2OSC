@@ -29,8 +29,11 @@ init:
 - if "%BUILDER%_%PLATFORM%"=="MSYS2_x64" set MSYSTEM=MINGW64
 - '%MSYS2_PATH%\usr\bin\bash -lc "pacman --noconfirm -S --needed unzip rsync mingw-w64-i686-ntldd-git"'
 - if "%BUILDER%"=="VS" set PATH=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin;%PATH%
+- '%MSYS2_PATH%\usr\bin\bash -lc "pacman --needed --noconfirm -S bash pacman pacman-mirrors msys2-runtime"'
+- '%MSYS2_PATH%\usr\bin\bash -lc "pacman --needed --noconfirm -Suu"'
 
 install:
+- pacman -Syu --noconfirm
 - cd ..
 - git clone --depth=1 --branch=master https://github.com/openframeworks/openFrameworks
 - mkdir openFrameworks\apps\myapps
