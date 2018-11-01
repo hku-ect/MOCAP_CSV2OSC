@@ -132,6 +132,8 @@ public:
         if(lock()){
             // set info for feedback text
             numFrames = ofToInt(words[11]);
+            take_name = words[3];
+            cap_time = words[5];
             info = "Name: "+ words[3]+"\n";
             info += "Capture Start Time: "+ words[5]+"\n";
             info += "Total Frames: "+ words[11];
@@ -244,7 +246,12 @@ public:
         return count;
     }
     
-    
+    // info feedback string
+    string info = "";
+    string take_name = "";
+    string cap_time = "";
+    int total_frames = 0;
+
 protected:
     // This is a simple variable that we aim to always access from both the
     // main thread AND this threaded object.  Therefore, we need to protect it
@@ -264,8 +271,6 @@ protected:
     std::map<string,MOCAP_Marker> rigidbodies;
     // map to store the found skeletons and their data
     std::map<string,MOCAP_Skeleton> skeletons;
-    // info feedback string
-    string info = "";
     
     int rigidBodyID = 0;
     int skeletonID = 0;

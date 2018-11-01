@@ -1,5 +1,7 @@
 #include "ofApp.h"
-
+#include "fontawesome5.h"
+#include "version.h"
+#include "themes.h"
 
 /*
  Name: CSVtoOSC
@@ -16,16 +18,13 @@ const float MOTIVE_MOCAP_FPS = 120.0f;
 
 // boolean to check if we play the data or not
 bool playData = false;
+static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
 
 //--------------------------------------------------------------
 void ofApp::setup(){
     
     // set logging level determing which message will be showed
     ofSetLogLevel(OF_LOG_VERBOSE);
-    
-    // get a font
-    font.load("verdana.ttf", 12);
-    
     // when startign we do not yet have any data
     dataLoaded = false;
     
@@ -33,29 +32,20 @@ void ofApp::setup(){
     sender.setup(HOST, PORT);
     
     // SETUP GUI
-    InterfaceX = ofGetWidth() - 250;
-    InterfaceY = 20;
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.IniFilename = NULL;                  // no imgui.ini
+    io.Fonts->AddFontDefault();
+    ImFontConfig config;
+    config.MergeMode = true;
+    //config.GlyphMinAdvanceX = 13.0f; // Use if you want to make the icon monospaced
+    config.PixelSnapH = true;
     
-    loadFileBTN.setup(ofRectangle(InterfaceX, InterfaceY, 120, 20), "Load csv file", 12,ofColor(0,0,0), ofColor(255,255,255));
-    
-    UserFeedback = "";
-    
-    
-    // Add Client GUI
-    int addClientY = 300;
-    int stepY = 40;
-    newName.setup(ofRectangle(InterfaceX, InterfaceY+addClientY, 140, 20), 10, "New Client","Client Name");
-    newIP.setup(ofRectangle(InterfaceX, InterfaceY+addClientY+(1*stepY), 140, 20), 10, "127.0.0.1","Client IP");
-    newPort.setup(ofRectangle(InterfaceX, InterfaceY+addClientY+(2*stepY), 140, 20), 10, "6200","Client Port");
-    addBTN.setup(ofRectangle(InterfaceX, InterfaceY+addClientY+(3*stepY), 140, 20), "Add Client", 12,ofColor(0,0,0), ofColor(255,255,255));
-    saveBTN.setup(ofRectangle(InterfaceX, InterfaceY+addClientY+(4*stepY), 120, 20), "Save Setup", 12, ofColor(0,0,0), ofColor(255,255,255));
-    
-    // other buttons
-    playpauseBTN.setup(ofRectangle(InterfaceX, InterfaceY+160, 120, 20), "play/pause", 12, ofColor(0,0,0), ofColor(255,255,255));
-    rewindBTN.setup(ofRectangle(InterfaceX+130, InterfaceY+160, 60, 20), "rewind", 12, ofColor(0,0,0), ofColor(255,255,255));
-    setFPSBTN.setup(ofRectangle(InterfaceX+100, InterfaceY+220, 70, 20), "set FPS", 12, ofColor(0,0,0), ofColor(255,255,255));
-    fps.setup(ofRectangle(InterfaceX, InterfaceY+220, 60, 20), 10, "30","FPS");
-    
+    io.Fonts->AddFontFromFileTTF(ofToDataPath( FONT_ICON_FILE_NAME_FAS ).data(), 12.0f, &config, icon_ranges);
+    gui.setup(new GuiGreenTheme(), false);              // default theme, no autoDraw!
+    io.IniFilename = NULL;                  // no imgui.ini
+    guiVisible = true;
+
     // get data
     setupData();
     
@@ -68,15 +58,13 @@ void ofApp::setupData()
 {
     ofxXmlSettings data("setup.xml");
     data.pushTag("setup",0);
-    int fRate = data.getValue("fps", 30);
+    frameRate = data.getValue("fps", 30);
     //string interface = data.getValue("interface", "en0");
     //string natnetip = data.getValue("ip", "10.200.200.13");
     //interfaceName.setText(interface);
     //interfaceIP.setText(natnetip);
-    fps.setText(ofToString(fRate));
-    
-    frameRate = fRate;
-    frameTime = 1.0 / fRate;
+
+    frameTime = 1.0 / frameRate;
     //ofSetFrameRate(fRate);
     data.popTag();
     
@@ -126,6 +114,7 @@ void ofApp::update(){
         doFrame();
         fTimeCounter -= frameTime;
     }
+    doGui();
 }
 
 void ofApp::doFrame() {
@@ -224,58 +213,9 @@ void ofApp::draw(){
     //ofDrawBitmapString("Press 'l' to load file", 20, 15);
     ofSetColor(255);
     ofSetBackgroundColor(40);
-    
-    // for visual feedback of file loading
-    csvloader.draw();
-    
-    // GUI
-    loadFileBTN.draw();
-    addBTN.draw();
-    newName.draw();
-    newIP.draw();
-    newPort.draw();
-    fps.draw();
-    saveBTN.draw();
-    setFPSBTN.draw();
-    if(dataLoaded == true){
-        playpauseBTN.draw();
-        rewindBTN.draw();
-    }
-    
-    
-    // show frames
-    ofSetColor(255);
-    
-    font.drawString("New User", InterfaceX, InterfaceY+280);
-    
-    // DRAW CLIENTS
-    for (int i = 0; i < clients.size(); i++)
-    {
-        clients[i]->draw();
-    }
-    
-    
-    int w = ofMap(frameNum, 0, totalFrames, 0, 200);
-    int barY = 100;
-    
-    ofSetColor(255,100,100);
-    ofNoFill();
-    ofDrawRectangle(ofRectangle(InterfaceX, InterfaceY+barY, 202, 22));
-    ofFill();
-    ofSetColor(255);
-    ofDrawRectangle(ofRectangle(InterfaceX, InterfaceY+barY, w, 20));
-    ofDrawBitmapString("FrameNum: "+ofToString(frameNum), InterfaceX, InterfaceY+barY+40);
-    
-    ofDrawBitmapString("FrameRate: "+ofToString(ofGetFrameRate()), InterfaceX, InterfaceY+barY+110);
-    
-    
-    if(UserFeedback != ""){
-        ofDrawBitmapStringHighlight(UserFeedback, ofGetWindowWidth()/2-UserFeedbackCanvas.width/2,ofGetWindowHeight()/2-UserFeedbackCanvas.height/2);
-    }
-    
-    
-   
-    
+
+    if ( this->guiVisible ) { gui.draw(); }
+    //gui.draw();
     // Playback teh recorded data
     /*
     if(dataLoaded == true && playData == true){
@@ -322,7 +262,7 @@ void ofApp::saveData()
     ofxXmlSettings save;
     save.addTag("setup");
     save.pushTag("setup",0);
-    save.addValue("fps", ofToInt(fps.getText()));
+    save.addValue("fps", frameRate);
     //save.addValue("interface", interfaceName.getText());
     //save.addValue("ip", interfaceIP.getText());
     save.popTag();
@@ -355,17 +295,14 @@ void ofApp::addClient(int i,string ip,int p,string n,bool r,bool m,bool s, bool 
             break;
         }
     }
-    
     if(uniqueClient){
         client *c = new client(i,ip,p,n,r,m,s,hierarchy);
         ofAddListener(c->deleteClient, this, &ofApp::deleteClient);
         clients.push_back(c);
-        if(UserFeedback != "") UserFeedback = "";
     }else{
-        // give feedback client already exists
-        UserFeedback = "\n A client with the same settings already exists. \n Please change IP address and or port! \n";
-        UserFeedbackCanvas = UserFeedbackFont.getBoundingBox(UserFeedback,0,0);
-        UserFeedbackCanvas.setPosition(ofGetWindowWidth()/2-UserFeedbackCanvas.width/2,ofGetWindowHeight()/2-UserFeedbackCanvas.height/2);
+        // TODO: create a logging console where we echo this message
+        // See console example in the imgui demo
+        ofLogWarning() << "A client with the same settings already exists. \n Please change IP address and or port!";
     }
 }
 
@@ -376,24 +313,7 @@ void ofApp::deleteClient(int &index)
 	int indexToRemove = index;
 	delete clients[indexToRemove];
 	clients.erase(clients.begin() + indexToRemove); 
-    for (int i = 0; i < clients.size(); i++)
-    {
-        clients[i]->rearangePosition(i,true);
-    }
 }
-
-//--------------------------------------------------------------
-void ofApp::deactivateInputs()
-{
-    //deactivate all inputfields
-    //interfaceName.deactivate();
-    //interfaceIP.deactivate();
-    fps.deactivate();
-    newName.deactivate();
-    newIP.deactivate();
-    newPort.deactivate();
-}
-
 
 //--------------------------------------------------------------
 void ofApp::loadAFile(){
@@ -476,31 +396,7 @@ void ofApp::keyPressed(int key){
     {
         //playData = ! playData;
     }
-    
-    // GUI
-    if (newName.getState())
-    {
-        newName.addKey(key);
-        return;
-    }
-    if (newIP.getState())
-    {
-        newIP.addKey(key);
-        return;
-    }
-    if (newPort.getState())
-    {
-        newPort.addKey(key);
-        return;
-    }
-    if (fps.getState())
-    {
-        fps.addKey(key);
-        return;
-    }
-
-    
-   }
+}
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
@@ -519,57 +415,6 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-    
-    deactivateInputs();
-    for (int i = 0; i < clients.size(); i++)
-    {
-        bool isInside = clients[i]->getArea().inside(x, y);
-        if (isInside)
-        {
-            clients[i]->isInside(x, y);
-            return;
-        }
-    }
-    
-    if (loadFileBTN.isInside(x, y)) loadAFile();
-    if(newName.isInside(x, y)) return;
-    if(newIP.isInside(x, y)) return;
-    if(newPort.isInside(x, y)) return;
-    if(fps.isInside(x, y)) return;
-    if(addBTN.isInside(x, y))
-    {
-        addClient(clients.size(), newIP.getText(), ofToInt(newPort.getText()), newName.getText(), false, false, false, true, false);
-        return;
-    }
-    if(saveBTN.isInside(x, y)) saveData();
-    if(setFPSBTN.isInside(x,y)){
-        frameRate = ofToInt(fps.getText());
-        frameTime = 1.0f / frameRate;
-        //ofSetFrameRate(frameRate);
-    }
-    if(playpauseBTN.isInside(x,y)){
-        ofLogVerbose("hit play/pause button");
-        if(dataLoaded == true ){
-            playData = ! playData;
-            ofLogVerbose("whithin dataloaded true");
-        }
-    }
-    
-    if(rewindBTN.isInside(x,y)){
-        frameNum = 0;
-        fFrameNum = 0;
-    }
-    
-    if (UserFeedbackCanvas.inside(x,y)){
-        UserFeedback = "";
-        
-    }else if(UserFeedback !=""){
-        UserFeedback = "";
-        
-    }
-
-    
-    
 
 }
 
@@ -601,4 +446,149 @@ void ofApp::gotMessage(ofMessage msg){
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
+}
+
+static bool version_popup = false;
+
+void ofApp::doGui() {
+    this->mouseOverGui = false;
+    if (this->guiVisible)
+    {
+        auto mainSettings = ofxImGui::Settings();
+        //ui stuff
+        gui.begin();
+        // Create a main menu bar
+        float mainmenu_height = 0;
+        if (ImGui::BeginMainMenuBar())
+        {
+            if (ImGui::BeginMenu("File"))
+            {
+                if (ImGui::MenuItem("Open CSV..", "Ctrl+O")) { loadAFile(); }
+                if (ImGui::MenuItem("Save Setup", "Ctrl+S"))   {saveData(); }
+                if (ImGui::MenuItem("About", "Ctrl+i")) { version_popup=true; }
+                if (ImGui::MenuItem("Exit", "Ctrl+W"))  { ofExit(0); }
+                ImGui::EndMenu();
+            }
+            mainmenu_height = ImGui::GetWindowSize().y;
+            ImGui::EndMainMenuBar();
+        }
+
+        // clients window
+        ImGui::SetNextWindowPos(ImVec2( 0, mainmenu_height ));
+        ImGui::SetNextWindowSize(ImVec2( ofGetWidth()-351, ofGetHeight()-mainmenu_height));
+        ImGui::Begin("clientspanel", NULL,  ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus);
+        // DRAW CLIENTS
+        for (int i = 0; i < clients.size(); i++)
+        {
+            bool enabled = true;
+            char buf[256];
+            snprintf(buf, sizeof(buf),"%s %s", ICON_FA_DESKTOP, clients[i]->getName().data());
+            if ( ImGui::CollapsingHeader(buf, &enabled, ImGuiTreeNodeFlags_DefaultOpen) )
+            {
+                clients[i]->draw();
+            }
+            if ( ! enabled )
+            {
+                ofNotifyEvent(clients[i]->deleteClient,i);
+            }
+        }
+        ImGui::End();
+
+        // right dock
+        ImGui::SetNextWindowPos(ImVec2( ofGetWidth()-350, mainmenu_height ));
+        ImGui::SetNextWindowSize(ImVec2( 350, ofGetHeight()-mainmenu_height));
+        ImGui::Begin("rightpanel", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_HorizontalScrollbar);
+        ImGui::Columns(2, "csvstats");
+        ImGui::Text("Name"); ImGui::NextColumn();
+        ImGui::Text(csvloader.take_name.data()); ImGui::NextColumn();
+        ImGui::Text("Capture Start Time"); ImGui::NextColumn();
+        ImGui::Text(csvloader.cap_time.data()); ImGui::NextColumn();
+        ImGui::Text("Total Frames"); ImGui::NextColumn();
+        ImGui::Text("%d", totalFrames); ImGui::NextColumn();
+        ImGui::Columns(1);
+        ImGui::Separator();
+
+        char fnumber[6];
+        sprintf(fnumber, "framenumber %d/%d", frameNum, totalFrames );
+        ImGui::ProgressBar(frameNum/float(totalFrames), ImVec2(-1,0), fnumber );
+
+        ImGui::Separator();
+
+        //playpause buttons
+        if ( ImGui::Button(ICON_FA_BACKWARD) )
+        {
+            if ( dataLoaded == true )
+            {
+                frameNum = 0;
+                fFrameNum = 0;
+            }
+            else
+            {
+                ofLogNotice() << "No data loaded yet?";
+            }
+        }
+        ImGui::SameLine();
+        if ( ImGui::Button(ICON_FA_PLAY) )
+        {
+            if ( dataLoaded == true )
+            {
+                playData = true;
+            }
+            else
+            {
+                ofLogNotice() << "No data loaded yet?";
+            }
+        }
+        ImGui::SameLine();
+        if ( ImGui::Button(ICON_FA_PAUSE) )
+        {
+            if ( dataLoaded == true )
+            {
+                playData = false;
+            }
+            else
+            {
+                ofLogNotice() << "No data loaded yet?";
+            }
+        }
+
+
+
+        // Framerate setter
+        if ( ImGui::DragInt("framerate", &frameRate, 1, 0, 300, "%.0f%") ) {
+             //frameRate = ofToInt(fps.getText());
+             frameTime = 1.0f / frameRate;
+        }
+
+        // client entry
+        ImGui::Separator();
+        static char client_name[128] = "localhost";
+        ImGui::InputText("client name", client_name, IM_ARRAYSIZE(client_name));
+        static char client_ip[15] = "127.0.0.1";
+        ImGui::InputText("client ip", client_ip, IM_ARRAYSIZE(client_ip));
+        static int client_port = 1234;
+        ImGui::InputInt("client port", &client_port);
+        if ( ImGui::Button(ICON_FA_DESKTOP " add client") )
+        {
+            addClient(clients.size(), ofToString(client_ip), client_port, ofToString(client_name), false, false, false, true, false );
+        }
+        if (version_popup) {
+            ImGui::OpenPopup("Version Info");
+        }
+        if (ImGui::BeginPopupModal("Version Info"))
+        {
+            ImGui::Text( "Version: " VERSION );
+            //TODO: more info through python
+            if ( ImGui::Button("Close") ) {
+                version_popup = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        ImGui::End();
+
+        gui.end();
+        this->mouseOverGui = mainSettings.mouseOverGui;
+    }
 }

@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include "ofMain.h"
 #include "ofxOsc.h"
-
+#include "ofxImGui.h"
 
 class client
 {

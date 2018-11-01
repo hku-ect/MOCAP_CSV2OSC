@@ -1,12 +1,11 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxImGui.h"
 #include "ofxOsc.h"
 #include "CSVloader.h" // include our ThreadedObject class.
 #include "MOCAP_Marker.h"
 #include "MOCAP_Skeleton.h"
-#include "ofxTextButton.h"
-#include "ofxTextInputField.h"
 #include "ofxXmlSettings.h"
 #include "client.h"
 
@@ -45,8 +44,6 @@ class ofApp : public ofBaseApp{
         void doFrame();
         void printOSCmessage(ofxOscMessage m);
     
-        void deactivateInputs();
-    
         CSVloader csvloader;
         /// \brief A local count that is only accessed in the main thread
         int mainAppsCount;
@@ -57,7 +54,7 @@ class ofApp : public ofBaseApp{
         bool dataLoaded;
         int frameNum;
         float fFrameNum;
-        int totalFrames;
+        int totalFrames = 1;
         int frameRate;
         float frameTime;
         float fTimeCounter;
@@ -66,28 +63,9 @@ class ofApp : public ofBaseApp{
         std::map<string,MOCAP_Skeleton> skeletons;
         ofxOscSender sender;
     
-        // interface
-        int                 InterfaceX;
-        int                 InterfaceY;
-    
-        ofRectangle         UserFeedbackCanvas;
-        ofBitmapFont        UserFeedbackFont;
-        string              UserFeedback;
-
-    
-        ofTrueTypeFont      font;
-        ofxTextButton       loadFileBTN;
-        ofxTextButton       addBTN;
-        ofxTextButton       saveBTN;
-        ofxTextButton       setFPSBTN;
-        ofxTextButton       playpauseBTN;
-        ofxTextButton       rewindBTN;
-
-    
-        ofxTextInputField   newName;
-        ofxTextInputField   newIP;
-        ofxTextInputField   newPort;
-        ofxTextInputField   fps;
-
-		
+        //GUI
+        ofxImGui::Gui gui;
+        bool guiVisible;
+        bool mouseOverGui;
+        void doGui();
 };
