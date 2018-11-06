@@ -58,7 +58,7 @@ after_build:
 - set /p GITVERSION=<gitversion.txt
 - del gitversion.txt
 - cd bin
-- 7z a %APPVEYOR_BUILD_FOLDER%\%APPVEYOR_PROJECT_NAME%_win_%APPVEYOR_REPO_BRANCH%_%GITVERSION%.zip *.*
+- 7z a -r %APPVEYOR_BUILD_FOLDER%\%APPVEYOR_PROJECT_NAME%_win_%APPVEYOR_REPO_BRANCH%_%GITVERSION%.zip *.*
 - dir
 
 deploy:
