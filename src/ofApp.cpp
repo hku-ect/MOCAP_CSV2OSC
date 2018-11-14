@@ -46,6 +46,7 @@ void ofApp::setup(){
     io.IniFilename = NULL;                  // no imgui.ini
     guiVisible = true;
 
+    ofLog::setChannel(uiLogWidget.channel);
     // get data
     setupData();
     
@@ -498,80 +499,85 @@ void ofApp::doGui() {
         ImGui::SetNextWindowPos(ImVec2( ofGetWidth()-350, mainmenu_height ));
         ImGui::SetNextWindowSize(ImVec2( 350, ofGetHeight()-mainmenu_height));
         ImGui::Begin("rightpanel", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_HorizontalScrollbar);
-        ImGui::Columns(2, "csvstats");
-        ImGui::Text("Name"); ImGui::NextColumn();
-        ImGui::Text(csvloader.take_name.data()); ImGui::NextColumn();
-        ImGui::Text("Capture Start Time"); ImGui::NextColumn();
-        ImGui::Text(csvloader.cap_time.data()); ImGui::NextColumn();
-        ImGui::Text("Total Frames"); ImGui::NextColumn();
-        ImGui::Text("%d", totalFrames); ImGui::NextColumn();
-        ImGui::Columns(1);
-        ImGui::Separator();
-
-        char fnumber[6];
-        sprintf(fnumber, "framenumber %d/%d", frameNum, totalFrames );
-        ImGui::ProgressBar(frameNum/float(totalFrames), ImVec2(-1,0), fnumber );
-
-        ImGui::Separator();
-
-        //playpause buttons
-        if ( ImGui::Button(ICON_FA_BACKWARD) )
+        if ( ImGui::CollapsingHeader("properties", NULL, ImGuiTreeNodeFlags_DefaultOpen) )
         {
-            if ( dataLoaded == true )
+            ImGui::Columns(2, "csvstats");
+            ImGui::Text("Name"); ImGui::NextColumn();
+            ImGui::Text(csvloader.take_name.data()); ImGui::NextColumn();
+            ImGui::Text("Capture Start Time"); ImGui::NextColumn();
+            ImGui::Text(csvloader.cap_time.data()); ImGui::NextColumn();
+            ImGui::Text("Total Frames"); ImGui::NextColumn();
+            ImGui::Text("%d", totalFrames); ImGui::NextColumn();
+            ImGui::Columns(1);
+
+            char fnumber[6];
+            sprintf(fnumber, "framenumber %d/%d", frameNum, totalFrames );
+            ImGui::ProgressBar(frameNum/float(totalFrames), ImVec2(-1,0), fnumber );
+
+            //playpause buttons
+            if ( ImGui::Button(ICON_FA_BACKWARD) )
             {
-                frameNum = 0;
-                fFrameNum = 0;
+                if ( dataLoaded == true )
+                {
+                    frameNum = 0;
+                    fFrameNum = 0;
+                }
+                else
+                {
+                    ofLogNotice() << "No data loaded yet?";
+                }
             }
-            else
+            ImGui::SameLine();
+            if ( ImGui::Button(ICON_FA_PLAY) )
             {
-                ofLogNotice() << "No data loaded yet?";
+                if ( dataLoaded == true )
+                {
+                    playData = true;
+                }
+                else
+                {
+                    ofLogNotice() << "No data loaded yet?";
+                }
             }
+            ImGui::SameLine();
+            if ( ImGui::Button(ICON_FA_PAUSE) )
+            {
+                if ( dataLoaded == true )
+                {
+                    playData = false;
+                }
+                else
+                {
+                    ofLogNotice() << "No data loaded yet?";
+                }
+            }
+
+            // Framerate setter
+            if ( ImGui::DragInt("framerate", &frameRate, 1, 0, 300, "%.0f%") ) {
+                 //frameRate = ofToInt(fps.getText());
+                 frameTime = 1.0f / frameRate;
+            }
+
+            // client entry
+            ImGui::Separator();
+            static char client_name[128] = "localhost";
+            ImGui::InputText("client name", client_name, IM_ARRAYSIZE(client_name));
+            static char client_ip[15] = "127.0.0.1";
+            ImGui::InputText("client ip", client_ip, IM_ARRAYSIZE(client_ip));
+            static int client_port = 1234;
+            ImGui::InputInt("client port", &client_port);
+            if ( ImGui::Button(ICON_FA_DESKTOP " add client") )
+            {
+                addClient(clients.size(), ofToString(client_ip), client_port, ofToString(client_name), false, false, false, true, false );
+            }
+            ImGui::Separator();
         }
-        ImGui::SameLine();
-        if ( ImGui::Button(ICON_FA_PLAY) )
+        // LOG WINDOW
+        if ( ImGui::CollapsingHeader("log console", NULL, 0 ) )
         {
-            if ( dataLoaded == true )
-            {
-                playData = true;
-            }
-            else
-            {
-                ofLogNotice() << "No data loaded yet?";
-            }
-        }
-        ImGui::SameLine();
-        if ( ImGui::Button(ICON_FA_PAUSE) )
-        {
-            if ( dataLoaded == true )
-            {
-                playData = false;
-            }
-            else
-            {
-                ofLogNotice() << "No data loaded yet?";
-            }
+            uiLogWidget.doGui();
         }
 
-
-
-        // Framerate setter
-        if ( ImGui::DragInt("framerate", &frameRate, 1, 0, 300, "%.0f%") ) {
-             //frameRate = ofToInt(fps.getText());
-             frameTime = 1.0f / frameRate;
-        }
-
-        // client entry
-        ImGui::Separator();
-        static char client_name[128] = "localhost";
-        ImGui::InputText("client name", client_name, IM_ARRAYSIZE(client_name));
-        static char client_ip[15] = "127.0.0.1";
-        ImGui::InputText("client ip", client_ip, IM_ARRAYSIZE(client_ip));
-        static int client_port = 1234;
-        ImGui::InputInt("client port", &client_port);
-        if ( ImGui::Button(ICON_FA_DESKTOP " add client") )
-        {
-            addClient(clients.size(), ofToString(client_ip), client_port, ofToString(client_name), false, false, false, true, false );
-        }
         if (version_popup) {
             ImGui::OpenPopup("Version Info");
         }
