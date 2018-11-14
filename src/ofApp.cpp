@@ -21,13 +21,15 @@ bool playData = false;
 static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
 
 //--------------------------------------------------------------
-void ofApp::setup(){
-    
+void ofApp::setup()
+{
+#ifdef TARGET_WIN32     // close the console on Windows
+    FreeConsole();
+#endif
     // set logging level determing which message will be showed
     ofSetLogLevel(OF_LOG_VERBOSE);
     // when startign we do not yet have any data
     dataLoaded = false;
-    
     // setup a OSC sender
     sender.setup(HOST, PORT);
     
