@@ -488,7 +488,7 @@ void ofApp::doGui() {
             snprintf(buf, sizeof(buf),"%s %s", ICON_FA_DESKTOP, clients[i]->getName().data());
             if ( ImGui::CollapsingHeader(buf, &enabled, ImGuiTreeNodeFlags_DefaultOpen) )
             {
-                clients[i]->draw();
+                clients[i]->doGui();
             }
             if ( ! enabled )
             {

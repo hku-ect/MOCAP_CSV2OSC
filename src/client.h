@@ -27,13 +27,7 @@ public:
     void setRigid(bool value);
     void setMarker(bool value);
     void setSkeleton(bool value);
-    void draw();
-    void drawGUI();
-    ofRectangle &getArea();
-    void isInside(int & x, int & y);
-    void moveArea(int & x, int & y);
-    void rearangePosition(int ind, bool wholeScreen);
-
+    void doGui();
     
     int &getID();
     string &getIP();
@@ -59,20 +53,7 @@ private:
     bool            isSkeleton;
     bool            deepHierarchy;
     
-    
-    
-    ofRectangle     area;
-    ofRectangle     rigButton;
-    ofRectangle     markButton;
-    ofRectangle     skelButton;
-    ofRectangle     hierarchyButton;
-    ofRectangle     delButton;
-    ofRectangle     modeButton;
-    
-    ofTrueTypeFont	verdana14;
-    
-    ofxOscSender    sender;
-    
+    ofxOscSender    sender;    
 };
 
 #endif /* defined(__NatNet2OSCbridge__client__) */
