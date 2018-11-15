@@ -8,6 +8,7 @@
 #include "MOCAP_Skeleton.h"
 #include "ofxXmlSettings.h"
 #include "client.h"
+#include "uiWidgets.h"
 
 #define HOST "192.168.0.105"
 #define PORT 1234
@@ -68,4 +69,5 @@ class ofApp : public ofBaseApp{
         bool guiVisible;
         bool mouseOverGui;
         void doGui();
+        uiLogger uiLogWidget;
 };
